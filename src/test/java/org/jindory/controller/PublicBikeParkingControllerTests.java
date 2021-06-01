@@ -38,10 +38,7 @@ public class PublicBikeParkingControllerTests {
 	public void getPublicBikeParkingList() throws Exception{
 		
 		Criteria cri;
-		
-//		cri.setPageNum(1);
-//		cri.setAmount(1000);
-		
+				
 		log.info(
 				mockMvc.perform(MockMvcRequestBuilders.get("/board/publicBikeParking")
 				.param("pageNum", "17")

@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.jindory.api.ApiExplorer;
-import org.jindory.api.publicBikeRent;
+import org.jindory.api.PublicBikeRent;
 import org.jindory.domain.AirVO;
 import org.jindory.domain.BikeVO;
 import org.jindory.domain.MyUtils;

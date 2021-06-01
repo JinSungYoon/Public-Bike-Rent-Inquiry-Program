@@ -7,10 +7,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.jindory.domain.ApiKeyVO;
+
 public class samplePublicBicycle {
+	
+	
+	
 	public static void main(String[] args) throws IOException {
-        StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088"); /*URL*/
-        urlBuilder.append("/" + "4547416665796a7335356251567572"); /*Service Key*/
+    
+		ApiKeyVO apiKey = new ApiKeyVO();
+		
+		StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088"); /*URL*/
+        urlBuilder.append("/" + apiKey.getPublicBikeRealTimeRentApiKey()); /*Service Key*/
         urlBuilder.append("/" + "json"); /*type*/
         urlBuilder.append("/" + URLEncoder.encode("bikeList","UTF-8")); /*함수명*/
         urlBuilder.append("/" + URLEncoder.encode("1", "UTF-8")); /*한 페이지 결과 수*/

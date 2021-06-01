@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
-import org.jindory.domain.AirVO;
 import org.jindory.domain.ApiKeyVO;
 import org.jindory.domain.BikeVO;
 import org.json.simple.JSONArray;
@@ -18,7 +17,7 @@ import org.json.simple.parser.JSONParser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class publicBikeRent {
+public class PublicBikeRent {
 	public static String getBikeRealTimeRentInfo(String serviceNm,String startIndex,String endIndex) throws IOException {
         
 		ApiKeyVO apiKey = new ApiKeyVO();
@@ -52,7 +51,7 @@ public class publicBikeRent {
         return sb.toString();
     }
 	
-	public static List<BikeVO> getbikeRentResultJson(String serviceNm,String startIndex,String endIndex)throws Exception{
+	public static List<BikeVO> getbikeRentResultList(String serviceNm,String startIndex,String endIndex)throws Exception{
 		 
 		System.out.println("ServiceName : "+serviceNm+" "+"Start Index : " + startIndex + " "+"End Index : "+endIndex);
 		
@@ -71,6 +70,24 @@ public class publicBikeRent {
 		 List<BikeVO> list = gson.fromJson(j_row.toString(), new TypeToken<List<BikeVO>>(){}.getType());
 		 
 		 return list;
+		 
+	 }
+	
+	public static JSONArray getbikeRentResultJson(String serviceNm,String startIndex,String endIndex)throws Exception{
+		 
+		System.out.println("ServiceName : "+serviceNm+" "+"Start Index : " + startIndex + " "+"End Index : "+endIndex);
+		
+		 String result = getBikeRealTimeRentInfo(serviceNm,startIndex,endIndex);
+		 // Json형태의 String을 Json으로 만들기
+		 JSONParser parser = new JSONParser();
+		 JSONObject jsonObj = (JSONObject) parser.parse(result);
+		 
+		 //response
+		 JSONObject j_rentBikeStatus= (JSONObject) jsonObj.get("rentBikeStatus");
+		 System.out.println("j_rentBikeStatus : "+j_rentBikeStatus);
+		 JSONArray j_row = (JSONArray) j_rentBikeStatus.get("row");
+		 
+		 return j_row;
 		 
 	 }
 	

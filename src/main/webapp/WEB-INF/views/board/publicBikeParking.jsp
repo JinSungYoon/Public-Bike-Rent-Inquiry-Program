@@ -4,7 +4,7 @@
 <%@include file="/WEB-INF/views/globalVariable.jsp"%>
 
 <%@ page session="false" %>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta charset="UTF-8">
@@ -12,12 +12,29 @@
 
 	<!-- Bootstrap 4 -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-	
-
 </head>
 <body>
 <h1>실시간 공공자전거 대여현황</h1>
-<div id="map" style="width:100%;height:350px;"></div>
+<div id="map" style="width:100%;height:350px;">
+</div>
+<div class ="search" style="">
+	<input id="address" type="text" placeHolder="검색할 주소" value="불정로 6"/>
+	<input id="submit" type="button" value="주소검색"/>
+</div>
+
+<div class="searchPlaceDiv">
+	<form id="searchPlaceForm" class="searchPlaceForm" action="/board/searchPlace" method="post">
+		<input id="placeName" name="placeName" type="text" placeHolder="검색할 주소" />
+		<input id="dataSubmit" type="button" value="검색"/>
+	</form>
+</div>
+<div>
+	<c:if test="${locationInfo!=null}">
+		<span class="title">${locationInfo[0].title}</span>
+		<span class="placeAddress">${locationInfo[0].address}</span>
+	</c:if>
+</div>
+
 <div class="panel-body">
 	<table id="bikeParkingTable" width="100%" class="table table-sriped table-boardered table-hover text-center">
 		<thead>
@@ -70,7 +87,7 @@
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 
 <!-- Naver Maps API -->
-<script type="text/javascript" src='https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=<%=naverMapApiKey%>'></script>
+<script type="text/javascript" src='https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=<%=naverMapApiKey%>&submodules=geocoder'></script>
 
 <script type="text/javascript">
 
@@ -78,10 +95,263 @@ var map = "";			// map 전역
 var marker = "";		//marker 전역
 var markers = [];		// marker 위치를 저장하기 위한 배열
 var infoWindows = [];	// information을 저장하기 위한 배열
+var parkingList;
+
+window.onload = function(){
+	
+	 map = new naver.maps.Map("map", {
+	        center: new naver.maps.LatLng(37.3595316, 127.1052133),
+	        zoom: 15,
+	        mapTypeControl: true
+	    });
+
+	    infoWindow = new naver.maps.InfoWindow({
+	        anchorSkew: true
+	    });
+		
+	    map.setCursor('pointer');
+
+	    // 좌표로 주소 검색 API
+	    function searchCoordinateToAddress(latlng) {
+
+	        infoWindow.close();
+			// 좌표 -> 주소 검색 API
+	        naver.maps.Service.reverseGeocode({
+	            coords: latlng,
+	            orders: [
+	                naver.maps.Service.OrderType.ADDR,
+	                naver.maps.Service.OrderType.ROAD_ADDR
+	            ].join(',')
+	        }, function(status, response) {
+	            if (status === naver.maps.Service.Status.ERROR) {
+	                return alert('Something Wrong!');
+	            }
+
+	            var items = response.v2.results,
+	                address = '',
+	                htmlAddresses = [];
+
+	            for (var i=0, ii=items.length, item, addrType; i<ii; i++) {
+	                item = items[i];
+	                address = makeAddress(item) || '';
+	                addrType = item.name === 'roadaddr' ? '[도로명 주소]' : '[지번 주소]';
+
+	                htmlAddresses.push((i+1) +'. '+ addrType +' '+ address);
+	            }
+
+	            infoWindow.setContent([
+	                '<div style="padding:10px;min-width:200px;line-height:150%;">',
+	                '<h4 style="margin-top:5px;">검색 좌표</h4><br />',
+	                htmlAddresses.join('<br />'),
+	                '</div>'
+	            ].join('\n'));
+
+	            infoWindow.open(map, latlng);
+	        });
+	    }
+
+	    // 주소로 위치 찾기 API
+	    function searchAddressToCoordinate(address) {
+	        naver.maps.Service.geocode({
+	            query: address
+	        }, function(status, response) {
+	            if (status === naver.maps.Service.Status.ERROR) {
+	                return alert('Something Wrong!');
+	            }
+
+	            if (response.v2.meta.totalCount === 0) {
+	                return alert('totalCount' + response.v2.meta.totalCount);
+	            }
+
+	            var htmlAddresses = [],
+	                item = response.v2.addresses[0],
+	                point = new naver.maps.Point(item.x, item.y);
+
+	            if (item.roadAddress) {
+	                htmlAddresses.push('[도로명 주소] ' + item.roadAddress);
+	            }
+
+	            if (item.jibunAddress) {
+	                htmlAddresses.push('[지번 주소] ' + item.jibunAddress);
+	            }
+
+	            if (item.englishAddress) {
+	                htmlAddresses.push('[영문명 주소] ' + item.englishAddress);
+	            }
+
+	            infoWindow.setContent([
+	                '<div style="padding:10px;min-width:200px;line-height:150%;">',
+	                '<h4 style="margin-top:5px;">검색 주소 : '+ address +'</h4><br />',
+	                htmlAddresses.join('<br />'),
+	                '</div>'
+	            ].join('\n'));
+				
+	            map.setCenter(point);
+	            infoWindow.open(map, point);
+	            
+	        });
+	    }
+		
+	    // 지역 이름으로 검색하는 함수
+	    var searchPlaceFormObj = $("#searchPlaceForm");
+	    
+	    $("#dataSubmit").on("click",function(e){
+	    	if(!searchPlaceFormObj.find("#placeName").val()){
+	    		alert("검색할 지명을 입력해주세요.");
+	    		return false;
+	    	}
+	    	
+	    	e.preventDefault();
+	    	
+	    	searchPlaceFormObj.submit();
+	    	
+	    	
+	    	$.ajax({
+				url : '/board/searchPlace',
+				data : {placeName:searchPlaceFormObj.find("#placeName").val()},		
+				dataType : "json",
+				type : 'POST',
+				error : function(){
+					alert("통신 실패");
+				},
+				success : function(result){
+					console.log("Success");
+					console.log(result);
+				}
+			}); //$.ajax
+	    	
+	    });
+	        
+	    // 초기에 위치 셋팅하는 함수
+	    function initGeocoder() {
+	        if (!map.isStyleMapReady) {
+	            return;
+	        }
+
+	        map.addListener('click', function(e) {
+	            searchCoordinateToAddress(e.coord);
+	        });
+
+	        $('#address').on('keydown', function(e) {
+	            var keyCode = e.which;
+
+	            if (keyCode === 13) { // Enter Key
+	                searchAddressToCoordinate($('#address').val());
+	            }
+	        });
+
+	        $('#submit').on('click', function(e) {
+	            e.preventDefault();
+
+	            searchAddressToCoordinate($('#address').val());
+	        });
+			
+	        if($(".placeAddress").text()!=""){
+	        	searchAddressToCoordinate($(".placeAddress").text());
+	        }else{
+	        	searchAddressToCoordinate('월드컵북로 396');	
+	        }
+	        
+	    }
+		
+	    // 주소정보 셋팅하는 함수
+	    function makeAddress(item) {
+	        if (!item) {
+	            return;
+	        }
+
+	        var name = item.name,
+	            region = item.region,
+	            land = item.land,
+	            isRoadAddress = name === 'roadaddr';
+
+	        var sido = '', sigugun = '', dongmyun = '', ri = '', rest = '';
+
+	        if (hasArea(region.area1)) {
+	            sido = region.area1.name;
+	        }
+
+	        if (hasArea(region.area2)) {
+	            sigugun = region.area2.name;
+	        }
+
+	        if (hasArea(region.area3)) {
+	            dongmyun = region.area3.name;
+	        }
+
+	        if (hasArea(region.area4)) {
+	            ri = region.area4.name;
+	        }
+
+	        if (land) {
+	            if (hasData(land.number1)) {
+	                if (hasData(land.type) && land.type === '2') {
+	                    rest += '산';
+	                }
+
+	                rest += land.number1;
+
+	                if (hasData(land.number2)) {
+	                    rest += ('-' + land.number2);
+	                }
+	            }
+
+	            if (isRoadAddress === true) {
+	                if (checkLastString(dongmyun, '면')) {
+	                    ri = land.name;
+	                } else {
+	                    dongmyun = land.name;
+	                    ri = '';
+	                }
+
+	                if (hasAddition(land.addition0)) {
+	                    rest += ' ' + land.addition0.value;
+	                }
+	            }
+	        }
+
+	        return [sido, sigugun, dongmyun, ri, rest].join(' ');
+	    }
+
+	    function hasArea(area) {
+	        return !!(area && area.name && area.name !== '');
+	    }
+
+	    function hasData(data) {
+	        return !!(data && data !== '');
+	    }
+
+	    function checkLastString (word, lastString) {
+	        return new RegExp(lastString + '$').test(word);
+	    }
+
+	    function hasAddition (addition) {
+	        return !!(addition && addition.value);
+	    }
+
+	    naver.maps.onJSContentLoaded = initGeocoder;
+	    naver.maps.Event.once(map, 'init_stylemap', initGeocoder);
+	
+};
 
 $(document).ready(function(){
     
-    // 초기에 marker를 설정하는 함수
+	// 화면 Load 이후에 공공 자전거 데이터 조회
+	$.ajax({
+		url : '/board/publicBikeParkingList',
+		dataType : "json",
+		type : 'POST',
+		error : function(){
+			alert("통신 실패");
+		},
+		success : function(result){
+			console.log("Success");
+			parkingList = result;
+			setupMarker(parkingList);
+		}
+	});
+	
+	// 초기에 marker를 설정하는 함수
     function setMarker(lat,lng,stationName){
     	
     	var position = new naver.maps.LatLng(lat, lng);
@@ -107,6 +377,7 @@ $(document).ready(function(){
         infowindow.open(map,marker);
         
         markers.push(marker);
+        marker.setMap(map);
     	infoWindows.push(infowindow);
     	
     }
@@ -129,9 +400,10 @@ $(document).ready(function(){
         });
     	
     	markers.push(marker);
-    	infoWindows.push(infowindow);
-    	
+
     	marker.setMap(map);
+    	
+    	infoWindows.push(infowindow);
     	
     }
     
@@ -149,15 +421,66 @@ $(document).ready(function(){
         }
     }
     
-    for(var loop=0;loop<$("#bikeParkingTable").find('.stationLatitude').length;loop++){
-    	if(loop==0){
-    		setMarker($("#bikeParkingTable").find('.stationLatitude').eq(loop).text(),$("#bikeParkingTable").find('.stationLongitude').eq(loop).text(),$("#bikeParkingTable").find('.stationName').eq(loop).text());
-    	}else{
-    		addMarker($("#bikeParkingTable").find('.stationLatitude').eq(loop).text(),$("#bikeParkingTable").find('.stationLongitude').eq(loop).text(),$("#bikeParkingTable").find('.stationName').eq(loop).text());
-    		naver.maps.Event.addListener(markers[loop], 'click', getClickHandler(loop));
-    	}
-    }
-    
+	
+	function setupMarker(data){
+		// 조회된 10개의 자전거 대여소 위치를 지도에 표시하는 부분
+		for(var loop=0;loop<data.length;loop++){
+	    	if(loop==0){
+	    		setMarker(data[loop].stationLatitude,data[loop].stationLongitude,data[loop].stationName);
+	    	}else{
+	    		addMarker(data[loop].stationLatitude,data[loop].stationLongitude,data[loop].stationName);
+	    		naver.maps.Event.addListener(markers[loop], 'click', getClickHandler(loop));
+	    	}
+	    }
+	}
+	
+    /*
+    var bounds = map.getBounds(),
+	    southWest = bounds.getSW(),
+	    northEast = bounds.getNE(),
+	    lngSpan = northEast.lng() - southWest.lng(),
+	    latSpan = northEast.lat() - southWest.lat();
+
+	naver.maps.Event.addListener(map, 'zoom_changed', function() {
+	    updateMarkers(map, markers);
+	
+	});
+	
+	naver.maps.Event.addListener(map, 'dragend', function() {
+	    updateMarkers(map, markers);
+	});
+	
+	function updateMarkers(map, markers) {
+	
+	    var mapBounds = map.getBounds();
+	    var marker, position;
+	
+	    for (var i = 20; i < 40; i++) {
+	
+	        marker = markers[i]
+	        position = marker.getPosition();
+	
+	        if (mapBounds.hasLatLng(position)) {
+	            showMarker(map, marker);
+	        } else {
+	            hideMarker(map, marker);
+	        }
+	    }
+	}
+	
+	function showMarker(map, marker) {
+	
+	    if (marker.setMap()) return;
+	    marker.setMap(map);
+	}
+	
+	function hideMarker(map, marker) {
+	
+	    if (!marker.setMap()) return;
+	    marker.setMap(null);
+	}
+    */
+
     // 공공자전거 목록 table 클릭 이벤트
 	$("#bikeParkingTable tr").click(function(){
 		
