@@ -14,9 +14,6 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
 <body>
-<%= application.getContextPath() %><br>
-<%= request.getSession().getServletContext().getRealPath("/resources/img") %><br>
-<%= application.getRealPath("/resources/img") %><br>
 <h1>실시간 공공자전거 대여현황</h1>
 <div id="map" style="width:100%;height:350px;">
 </div>

@@ -11,8 +11,12 @@
   - 서울시 공공공공자전거 실시간 대여정보(http://data.seoul.go.kr/dataList/OA-15493/A/1/datasetView.do)
   - 네이버 지도 API(https://www.ncloud.com/product/applicationService/maps)	
 
+현재 구현된 기능
+
+- 서울시 자전거 대여소 위치 정보 지도에 표시
+- 검색을 통한 위치 이동 및 가까운 대여소 조회 
+
 향후 추가 예정 기능
 
 - 현 위치를 기반으로 한 가장 가까운 자전거 대여소 조회
-- 위치 검색을 통한 가장 가까운 대여소 조회
 - 대여소 선택시 게시글 등록 및 수정
