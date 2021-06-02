@@ -54,7 +54,11 @@ public class PublicBikeParkingController {
 	public @ResponseBody Object publicBikeParkingList() throws Exception{
 		
 		JSONArray list = new JSONArray();
-		list = PublicBikeRent.getbikeRentResultJson("bikeList", "1","1000");
+		JSONArray temp = new JSONArray();
+		for(int loop=1;loop<=2000;loop=loop+1000) {
+			temp = PublicBikeRent.getbikeRentResultJson("bikeList", Integer.toString(loop),Integer.toString(loop+999));
+			list.addAll(temp);
+		}
 						
 		return list;
 	}

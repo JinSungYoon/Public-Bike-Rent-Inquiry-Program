@@ -84,8 +84,8 @@ public class PublicBikeRent {
 		 
 		 //response
 		 JSONObject j_rentBikeStatus= (JSONObject) jsonObj.get("rentBikeStatus");
-		 System.out.println("j_rentBikeStatus : "+j_rentBikeStatus);
 		 JSONArray j_row = (JSONArray) j_rentBikeStatus.get("row");
+		 System.out.println("j_row : "+j_row);
 		 
 		 return j_row;
 		 

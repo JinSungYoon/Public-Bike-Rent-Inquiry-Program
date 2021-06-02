@@ -43,7 +43,7 @@ public class SearchLocationAddress {
 		
 		Map<String,String> requestHeaders = new HashMap<>();
 		requestHeaders.put("X-Naver-Client-Id",apiKey.getNaverClientId());
-		requestHeaders.put("X-Naver-Client-Secret", apiKey.getNaverClientId());
+		requestHeaders.put("X-Naver-Client-Secret", apiKey.getNaverClientSecret());
 		String responseBody = get(apiURL,requestHeaders);
 		
 		System.out.println("네이버에서 받은 결과 = " + responseBody);
