@@ -3,7 +3,7 @@
 이 프로젝트는 서울시 공공자전거 대여 현황을 조회 및 문의사항을 등록 및 조회하는 프로그램입니다.
 
 현재 구성한 Layout은 아래 Screenshot과 같으며 현재는 서울시 공공자전거 대여소의 현황을 조회 할 수 있습니다.
-![publicBikeRentInquiryLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/publicBikeRentInquiryLayout.jpg)
+![publicBikeRentInquiryLayout](D:\Programming\Java\workspace\publicDataPortal\img\publicBikeRentInquiryLayout.jpg)
 
 현재 구현된 기능은 서울시 공공데이터 현황을 조회하여 조회된 자전거 대여소의 위치를 지도에 보여주고 있습니다.
 
