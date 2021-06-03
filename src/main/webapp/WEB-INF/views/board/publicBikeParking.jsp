@@ -28,13 +28,6 @@
 		<input id="dataSubmit" type="button" value="지역명검색"/>
 	</form>
 </div>
-<div>
-	<c:if test="${locationInfo!=null}">
-		<span class="title">${locationInfo[0].title}</span>
-		<span class="placeAddress">${locationInfo[0].address}</span>
-	</c:if>
-</div>
-
 <div class="panel-body">
 	<table id="bikeParkingTable" width="100%" class="table table-sriped table-boardered table-hover text-center">
 		<thead>
@@ -591,25 +584,36 @@ $(document).ready(function(){
         //화면에 출력할 마스크를 설정해줍니다.
         var mask       ="<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0;'></div>";
         var loadingImg ='';
-          
-        loadingImg +="<img src='/resources/img/loading.gif' style='position: absolute; display: block; margin: 0px auto;'/>";
+        
+        loadingImg +="<div id='loadingImg'>";
+        loadingImg +=" <img src='/resources/img/loading.gif' style='position: relative; display: block; margin: 0px auto; width:100px; height:100px;'/>";
+        loadingImg +="</div>";        
      
         //화면에 레이어 추가
-        $('body')
-            .append(mask)
+        $('body').append(mask)
+        	
      
+        $("#mask").append(loadingImg)
+        
         //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채웁니다.
         $('#mask').css({
                 'width' : maskWidth,
                 'height': maskHeight,
                 'opacity' :'0.3'
         });
-      
+      	
+        $('#loadingImg').css({
+            'width' : '500px',
+            'height': '500px',
+            'padding' : '500px 800px',
+            'text-align':'center',
+        	//'opacity' :'0.1'
+    	});
+        
         //마스크 표시
         $('#mask').show();
       
         //로딩중 이미지 표시
-        $('#loadingImg').append(loadingImg);
         $('#loadingImg').show();
     }
      
