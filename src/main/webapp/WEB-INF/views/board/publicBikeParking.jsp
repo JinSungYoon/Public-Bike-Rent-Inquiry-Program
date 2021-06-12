@@ -2,14 +2,13 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@include file="/WEB-INF/views/globalVariable.jsp"%>
-
+<%@include file="../includes/header.jsp" %>
 <%@ page session="false" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta charset="UTF-8">
 <title>서울시 따릉이 자전거</title>
-
 	<!-- Bootstrap 4 -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 </head>
@@ -40,6 +39,7 @@
 				<th>거치대 위도</th>
 				<th>거치대 경도</th>
 				<th>대여소 ID</th>
+				<th>상세정보</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -53,11 +53,24 @@
 					<td class="stationLatitude"><c:out value="${item.stationLatitude}"/></td>
 					<td class="stationLongitude"><c:out value="${item.stationLongitude}"/></td>
 					<td class="stationId"><c:out value="${item.stationId}"/></td>
+					<td class="arrow"><button class="accordion">▼</button></td>
+				</tr>
+				<tr class="fold" style="display:none;">
+					<td colspan="9">
+						<c:set var="index" value="${vs.index}"/>
+						<!-- c:if test="${empty breakdownReport[index].getStationid()}" -->
+						<div class="fold-content">
+							<h3>Hello world</h3>
+							<span>${breakdownCount.get(index).get("STATIONID")}</span>
+							<span>${breakdownCount.get(index).get("CNT")}</span>
+						</div>
+						<!-- /c:if -->
+					</td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
-	<div class="pull-right">
+	<div class="pull-left">
 		<ul class="pagination">
 			<c:if test="${pageMarker.prev}">
 				<li class="page-item"><a class="page-link" href="${pageMarker.startPage-1}">«</a></li>
@@ -90,11 +103,11 @@ var markers = [];		// marker 위치를 저장하기 위한 배열
 var infoWindows = [];	// information을 저장하기 위한 배열
 var parkingList;
 
-window.onload = function(){
+window.onload = function(){	//html 로딩 이후에 시작
 	
 };
 
-$(document).ready(function(){
+$(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
     
 	// 화면 Load 이후에 공공 자전거 데이터 조회
 	$.ajax({
@@ -519,9 +532,6 @@ $(document).ready(function(){
 		var tr = $(this);
 		var td = tr.children();
 		
-		// tr.text() 클릭된 Row 즉 tr에 모든 값을 가져온다.
-		// console.log("클릭한 Row의 모든 데이터 : "+tr.text());
-		
 		// 반복문을 이용해서 배열에 값을 담아 사용할 수 도 있다.
 		td.each(function(i){
 			tdArr.push(td.eq(i).text());
@@ -541,30 +551,6 @@ $(document).ready(function(){
 		
 		searchCoordinateToAddress(latlng);
 		
-		/*
-		// 네이버 지도에 위경도에 맞는 지도 display
-        var mapOptions = {
-        	    center: new naver.maps.LatLng(stationLatitude, stationLongitude),
-        	    zoom: 14,
-        	    mapTypeControl : true,
-        	    zoomControl : true,
-        	};
-        
-        map = new naver.maps.Map('map', mapOptions);
-        
-        // Naver 지도위에 marker로 위치표시
-        var marker = new naver.maps.Marker({
-        	position : new naver.maps.LatLng(stationLatitude,stationLongitude),
-        	map : map,
-        	title : stationName,
-        });
-        
-        var infowindow = new naver.maps.InfoWindow({
-        	content : stationName
-        });
-        
-        infowindow.open(map,marker);
-        */
 	});
     
     var actionForm = $("#actionForm");
@@ -586,7 +572,7 @@ $(document).ready(function(){
         var loadingImg ='';
         
         loadingImg +="<div id='loadingImg'>";
-        loadingImg +=" <img src='/resources/img/loading.gif' style='position: relative; display: block; margin: 0px auto; width:100px; height:100px;'/>";
+        loadingImg +=" <img src='/resources/img/loading.gif' style='position: relative; display: block; margin: 0px auto; width:150px; height:150px;'/>";
         loadingImg +="</div>";        
      
         //화면에 레이어 추가
@@ -622,6 +608,33 @@ $(document).ready(function(){
         $('#mask, #loadingImg').empty(); 
     }
     
+    
+    var acc = $(".accordion");
+    
+   	for (i = 0; i < acc.length; i++) {
+ 	  
+   		acc[i].addEventListener("click", function() {
+  		var idx = Number(this.parentElement.parentElement.children[0].textContent)-1;
+		if($(".fold")[idx].style.display=="none"){
+ 			 $(".fold")[idx].style.display = "block";
+ 		  }else{
+ 			 $(".fold")[idx].style.display = "none";
+ 		  }
+ 	  });
+ 		/*
+		document.getElementsByClassName("accordion")[i].addEventListener("click",function(e){
+			console.log(e);
+			console.log(this);
+			var idx = Number(this.parentElement.parentElement.children[0].textContent)-1;
+			if($(".fold")[idx].style.display=="none"){
+	 			 $(".fold")[idx].style.display = "block";
+	 		  }else{
+	 			 $(".fold")[idx].style.display = "none";
+	 		  }
+		});
+ 		*/
+ 	} 
+   	
 });
 	
 </script>

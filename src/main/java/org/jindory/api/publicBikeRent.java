@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.jindory.domain.ApiKeyVO;
@@ -68,6 +70,21 @@ public class PublicBikeRent {
 		 // 2. Gson -> 배열로 변경 List<BikeVO>
 		 Gson gson = new Gson();
 		 List<BikeVO> list = gson.fromJson(j_row.toString(), new TypeToken<List<BikeVO>>(){}.getType());
+		
+		// 정류장ID로 오름차수 청렬
+		Collections.sort(list, new Comparator<BikeVO>(){
+			@Override
+			public int compare(BikeVO b1,BikeVO b2) {
+				int prev = Integer.parseInt(b1.getStationId().substring(3,b1.getStationId().length()));
+				int next = Integer.parseInt(b2.getStationId().substring(3,b2.getStationId().length()));
+				if(prev<next) {
+					return -1;
+				}else if(prev>next) {
+					return 1;
+				}
+				return 0;
+			}
+		});
 		 
 		 return list;
 		 

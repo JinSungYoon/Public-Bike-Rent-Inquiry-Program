@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jindory.dataSource.BreakdownReport">
+	
+	<select id="searchBreakdownReport" resultType="org.jindory.domain.BreakdownReportVO">
+		SELECT bnum,btitle,stationid,bikenum,brokenparts,content,writer,createdate,updatedate
+		FROM(
+			SELECT ROWNUM rn,bnum,btitle,stationid,bikenum,brokenparts,content,writer,createdate,updatedate
+			FROM breakdown_report
+			WHERE ROWNUM BETWEEN 1 AND 100
+			
+			<if test="keyword != null ">
+				AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' )
+			</if>
+
+			ORDER BY BNUM
+		)
+		WHERE rn BETWEEN (#{pageNum}*#{amount})-9 AND (#{pageNum}*#{amount})
+	</select>
+	
+	<select id="getBreakdownReport" resultType="org.jindory.domain.BreakdownReportVO">
+		SELECT *
+		FROM breakdown_report
+		WHERE bnum = #{bnum}
+		ORDER BY BNUM
+	</select>
+	
+	<insert id="insertBreakdownReport" parameterType="org.jindory.domain.BreakdownReportVO">
+		<selectKey keyProperty="bnum" order="BEFORE" resultType="long"> 
+			SELECT MAX(bnum)+1 from breakdown_report
+		</selectKey>
+		INSERT INTO breakdown_report(bnum,btitle,bikenum,stationid,brokenparts,content,writer)
+		VALUES(#{bnum},#{btitle},#{bikenum},#{stationid},#{brokenparts},#{content},#{writer})
+	</insert>
+	
+	<insert id="insertCustomBnumBreakdownReport">
+		INSERT INTO breakdown_report(bnum,btitle,bikenum,stationid,brokenparts,content,writer)
+		VALUES(#{bnum},#{btitle},#{bikenum},#{stationid},#{brokenparts},#{content},#{writer})
+	</insert>
+	
+	<update id="updateBreakdownReport">
+		UPDATE breakdown_report SET 
+		bnum = #{bnum},
+		btitle = #{btitle},
+		stationid = #{stationid},
+		brokenparts = #{brokenparts},
+		content = #{content},
+		writer  = #{writer},
+		updatedate = SYSDATE
+		WHERE bnum = #{bnum}
+	</update>
+	
+	<delete id="deleteBreakdownReport">
+		DELETE breakdown_report
+		WHERE bnum = #{bnum}
+	</delete>
+	
+	<select id="searchBreakdownCount" resultType="java.util.Map">
+	WITH temp as (
+	SELECT 
+	    LEVEL
+	    ,'ST-'||LEVEL AS STATIONID
+	    ,0 as CNT
+	FROM DUAL 
+	CONNECT BY LEVEL BETWEEN 1 AND 2000
+	), breakdown as(
+	SELECT COUNT(*) AS CNT,STATIONID
+	FROM breakdown_report
+	GROUP BY STATIONID
+	)
+	SELECT NVL(b.STATIONID,t.STATIONID) AS STATIONID, NVL(b.CNT,t.CNT) AS CNT
+	FROM breakdown b, temp t
+	WHERE t.STATIONID = b.STATIONID(+)
+	AND TO_NUMBER(SUBSTR(t.STATIONID,4)) BETWEEN (#{pageNum}*#{amount})-9 AND (#{pageNum}*#{amount})
+	ORDER BY TO_NUMBER(SUBSTR(t.STATIONID,4))
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(BNUM)
+		FROM breakdown_report 
+		WHERE 1=1
+		<if test="keyword != null ">
+			AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' )
+		</if>
+		ORDER BY BNUM DESC
+	</select>
+	
+</mapper>
