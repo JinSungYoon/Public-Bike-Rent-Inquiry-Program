@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -140,6 +141,28 @@ public class PublicBikeParkingController {
 		log.info("BNUM : "+bnum);
 				
 		rttr.addFlashAttribute("result",bnum);
+		
+		return "redirect:/board/breakdownList";
+	}
+
+	@RequestMapping(value="/updateBreakdownReport",method=RequestMethod.POST)
+	public String updateBreakdownReport(@RequestBody Map<String,String> data,RedirectAttributes rttr)throws Exception {
+		
+		BreakdownReportVO input = new BreakdownReportVO();
+		
+		input.setBnum(Long.parseLong(data.get("bnum")));
+		input.setBikenum(Long.parseLong(data.get("bikenum")));
+		input.setBrokenparts(data.get("brokenparts"));
+		input.setBtitle(data.get("btitle"));
+		input.setContent(data.get("content"));
+		input.setStationid(data.get("stationid"));
+		input.setWriter(data.get("writer"));
+		
+		Long num = breakdownReportService.modify(input);
+		
+		log.info("Modify num : "+num);
+
+		rttr.addFlashAttribute("modifyNum", num);
 		
 		return "redirect:/board/breakdownList";
 	}

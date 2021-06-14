@@ -54,7 +54,7 @@
                              <textarea class="form-control" rows="5" cols="50" name="content"></textarea>
                          </div>
                      	<button type="register" class="btnSubmit">생성</button>
-                     	<button type="delete" class="btnDelete">삭제</button>
+                     	<button type="delete" class="btnCancel">취소</button>
                      </form>
                  </div>
                  <!-- /.panel-body -->
@@ -84,6 +84,19 @@ $(document).ready(function(){
 				window.location.href = '/board/breakdownList';
 			}
 		});
+		
+	});
+	
+	$(".btnReset").on("click",function(){
+		
+		if(confirm("초기화 하시겠습니까?")){
+			$("input[name=btitle]").val("")
+			$("input[name=stationid]").val("")
+			$("input[name=bikenum]").val("")
+			$("input[name=brokenparts]").val("")
+			$("input[name=writer]").val("")
+			$("textarea[name=content]").val("")	
+		}
 		
 	});
 });

@@ -115,12 +115,21 @@ public class BreakdownReportTests {
 //		BreakdownReports.searchBreakdownCount(index).forEach(data->log.info(data));
 //	}
 	
-	@Test
-	public void testGetTotalCount() {
-		Criteria data = new Criteria();
-		data.setKeyword("바퀴");
-		log.info("Total count : "+BreakdownReports.getTotalCount(data));
-	}
+//	@Test
+//	public void testGetTotalCount() {
+//		Criteria data = new Criteria();
+//		data.setKeyword("바퀴");
+//		log.info("Total count : "+BreakdownReports.getTotalCount(data));
+//	}
 	
+	@Test
+	public void testUpdateBreakdownReport() {
+		BreakdownReportVO data = new BreakdownReportVO();
+		data.setBnum(20L);
+		data.setBrokenparts("핸들");
+		data.setWriter("수정자");
+		data.setContent("손접이 고무가 벗겨졌어요");
+		log.info("Outnum : "+BreakdownReports.updateBreakdownReport(data));
+	}
 }
 

@@ -40,14 +40,23 @@
 		VALUES(#{bnum},#{btitle},#{bikenum},#{stationid},#{brokenparts},#{content},#{writer})
 	</insert>
 	
-	<update id="updateBreakdownReport">
+	<update id="updateBreakdownReport" parameterType="org.jindory.domain.BreakdownReportVO">
 		UPDATE breakdown_report SET 
-		bnum = #{bnum},
+		<if test="btitle != null">
 		btitle = #{btitle},
+		</if>
+		<if test="stationid != null">
 		stationid = #{stationid},
+		</if>
+		<if test="brokenparts != null">
 		brokenparts = #{brokenparts},
+		</if>
+		<if test="content != null"> 
 		content = #{content},
+		</if>
+		<if test="writer != null">
 		writer  = #{writer},
+		</if>
 		updatedate = SYSDATE
 		WHERE bnum = #{bnum}
 	</update>

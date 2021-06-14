@@ -42,11 +42,11 @@
 		</tbody>
 	</table>
 	<div class="pull-right">
-		<form id="searchPostForm" class="searchPostForm" action="/board/breakdownList" method="get">
+		<form id="searchPostForm" class="searchPostForm" action="/board/breakdownList" method="get" style="float:left;">
 			<input id="keyword" name="keyword" type="text" placeHolder="Search..." />
-			<input id="btnSearch" class="btnSearch" type="button" value="검색어"/>
+			<input id="btnSearch" class="btnSearch" type="button" value="검색어" />
 		</form>
-		<button class="btnWrite">작성</button>
+		<input id="btnWriter" class="btnWrite" style="float:right;" type="button" value="글쓰기"></input>
 	</div>
 	<div class="pull-left">
 		<ul class="pagination">

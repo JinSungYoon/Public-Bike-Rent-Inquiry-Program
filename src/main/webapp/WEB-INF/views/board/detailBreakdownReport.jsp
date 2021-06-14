@@ -28,29 +28,29 @@
                    	   <div class="form-group">
                            <label>제목</label>
                            <span class="btitle"></span>
-                           <input class="form-control" name="btitle" value='<c:out value="${post.btitle}"/>' readonly="readonly">
+                           <input class="form-control" name="btitle" value='<c:out value="${post.btitle}"/>'>
                        </div>
                        <div class="form-group">
                            <label>자전거 정류장</label>
-                           <input class="form-control" name="stationid" value='<c:out value="${post.stationid}"/>' readonly="readonly">
+                           <input class="form-control" name="stationid" value='<c:out value="${post.stationid}"/>'>
                        </div>
                        <div class="form-group">
                            <label>자전거 번호</label>
-                           <input class="form-control" name="bikenum" value='<c:out value="${post.bikenum}"/>' readonly="readonly">
+                           <input class="form-control" name="bikenum" value='<c:out value="${post.bikenum}"/>'>
                        </div>
                        <div class="form-group">
                            <label>고장부품</label>
-                           <input class="form-control" name="brokenparts" value='<c:out value="${post.brokenparts}"/>' readonly="readonly">
+                           <input class="form-control" name="brokenparts" value='<c:out value="${post.brokenparts}"/>'>
                        </div>
                        <div class="form-group">
                            <label>작성자</label>
-                           <input class="form-control" name="writer" value='<c:out value="${post.writer}"/>' readonly="readonly">
+                           <input class="form-control" name="writer" value='<c:out value="${post.writer}"/>'>
                        </div>
                        <div class="form-group">
                            <label>내용</label>
-                           <textarea class="form-control" rows="5" cols="50" name="content" readonly="readonly"><c:out value="${post.content}"/></textarea>
+                           <textarea class="form-control" rows="5" cols="50" name="content"><c:out value="${post.content}"/></textarea>
                        </div>
-                   	<button type="modify" class="btnSubmit">수정</button>
+                   	<button type="modify" class="btnModify">수정</button>
                    	<button type="delete" class="btnDelete">삭제</button>
                  </div>
                  <!-- /.panel-body -->
@@ -78,19 +78,64 @@ $(document).ready(function(){
 	});
 	
 	$(".btnDelete").on("click",function(e){
-		e.preventDefault();
-		$.ajax({
-			url:'/board/deleteBreakdownReport',
-			data : {bnum:$("input[name=bnum]").val()},
-			type:'POST',
-			error : function(e){
-				alert("통신 실패 : "+e);
-			},
-			success : function(result){
-				console.log("통신 성공");
-			}
-			
-		});
+		
+		if(confirm("삭제하시겠습니까?")){
+			e.preventDefault();
+			$.ajax({
+				url:'/board/deleteBreakdownReport',
+				data : {bnum:$("input[name=bnum]").val()},
+				type:'POST',
+				error : function(e){
+					alert("통신 실패 : "+e);
+				},
+				success : function(result){
+					console.log("통신 성공");
+				}
+				
+			});
+		}
+	});
+	
+	$(".btnModify").on("click",function(e){
+		
+		var bnum = $("input[name=bnum]").val();
+		var btitle = $("input[name=btitle]").val();
+		var stationid = $("input[name=stationid]").val();
+		var bikenum = $("input[name=bikenum]").val();
+		var brokenparts = $("input[name=brokenparts]").val();
+		var writer = $("input[name=writer]").val();
+		var content = $("textarea[name=content]").val();	
+		
+		var param = {"bnum":bnum,"btitle":btitle,"stationid":stationid,"bikenum":bikenum,"brokenparts":brokenparts,"writer":writer,"content":content};
+		
+		if(confirm("수정하시겠습니까?")){
+			e.preventDefault();
+			$.ajax({
+				url  : '/board/updateBreakdownReport',
+				//data : {data:JSON.stringify(param)},
+				data : JSON.stringify({
+					bnum : bnum,
+					btitle : btitle,
+					stationid : stationid,
+					bikenum : bikenum,
+					prokenparts : brokenparts,
+					writer : writer,
+					content : content
+				}),
+				contentType : 'application/json',
+				type : 'POST',
+				dataType : "text",
+				error : function(e){
+					console.log(e);
+				},
+				success : function(result){
+					
+					alert("성공적으로 수정되었습니다.");
+
+					window.location.href = '/board/breakdownList';
+				}
+			});
+		}
 	});
 });
 </script>
