@@ -8,8 +8,10 @@
 
 ![publicBikeRentInquiryLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/publicBikeRentInquiryLayout.jpg)
 
-- 고장신고 등록 및 조회
+- 고장신고 리스트
   ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/breakdownReportLayout.JPG)
+- 고장신고 등록,수정,삭제
+  ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/breakdownReportDetailLayout.JPG)
 
 현재 구현된 기능은 서울시 공공데이터 현황을 조회하여 조회된 자전거 대여소의 위치를 지도에 보여주고 있습니다.
 
@@ -22,6 +24,7 @@
 - 서울시 자전거 대여소 위치 정보 지도에 표시
 - 검색을 통한 위치 이동 및 가까운 대여소 조회 
 - 고장신고 게시판 기능 추가
+- 고장신고 게시글 첨부파일 기능 추가
 
 향후 추가 예정 기능
 
