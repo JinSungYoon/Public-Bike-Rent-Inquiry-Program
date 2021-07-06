@@ -1,0 +1,47 @@
+@charset "EUC-KR";
+
+
+.uploadResult {
+	width : 100%;
+	backgrould-color : lightgrey;
+}
+
+.uploadResult ul{
+	display : flex;
+	flex-flow : row;
+	justify-content : center;
+	align-items : center;
+}
+
+.uploadResult ul li{
+	list-style : none;
+	padding : 10px;
+}
+
+.uploadResult ul li img{
+	width : 45px;
+	height : 30px;
+}
+
+.bicPictureWrapper {
+	position : absolute;
+	display : none;
+	justify-content : center;
+	align-items : center;
+	top : 0%;
+	width : 100%;
+	height : 100%;
+	background-color : lightgrey;
+	z-index : 100;
+}
+
+.bicPicture{
+	position : relativ;
+	display : flex;
+	justify-content: center;
+	align-items : center;
+}
+
+.bicpicture img{
+	width:600px;
+}

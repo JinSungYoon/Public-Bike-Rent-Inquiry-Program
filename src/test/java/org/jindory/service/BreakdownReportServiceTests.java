@@ -34,18 +34,18 @@ public class BreakdownReportServiceTests {
 //		log.info("========================== End get test ==========================");
 //	}
 	
-	@Test
-	public void testSearchList() {
-		List<BreakdownReportVO> list = new ArrayList<BreakdownReportVO>();
-		Criteria cri = new Criteria();
-		cri.setAmount(10);
-		cri.setPageNum(1);
-		cri.setKeyword("바퀴");
-		log.info("========================== Test Search report ==========================");
-		list = breakdownReportService.searchList(cri);
-		list.forEach(data -> log.info(data));
-		log.info("========================== End Search report ==========================");
-	}
+//	@Test
+//	public void testSearchList() {
+//		List<BreakdownReportVO> list = new ArrayList<BreakdownReportVO>();
+//		Criteria cri = new Criteria();
+//		cri.setAmount(10);
+//		cri.setPageNum(1);
+//		cri.setKeyword("바퀴");
+//		log.info("========================== Test Search report ==========================");
+//		list = breakdownReportService.searchList(cri);
+//		list.forEach(data -> log.info(data));
+//		log.info("========================== End Search report ==========================");
+//	}
 	
 //	@Test
 //	@Transactional
@@ -89,10 +89,18 @@ public class BreakdownReportServiceTests {
 //		breakdownReportService.searchBreakdownCount(index).forEach(data -> log.info(data));
 //	}
 	
+//	@Test
+//	public void testGetTotalCount() {
+//		Criteria data = new Criteria();
+//		
+//		log.info("Return : "+breakdownReportService.getTotalCount(data));
+//	}
+	
 	@Test
-	public void testGetTotalCount() {
-		Criteria data = new Criteria();
-		
-		log.info("Return : "+breakdownReportService.getTotalCount(data));
+	public void testGetMaxNum() {
+		log.info("==================== Test get max num =========================");
+		Long returnNum = breakdownReportService.getMaxNum();
+		log.info("return num : "+returnNum);
 	}
+	
 }

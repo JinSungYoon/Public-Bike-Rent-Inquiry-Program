@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.log4j.Log4j;
 
@@ -44,22 +45,32 @@ public class BreakdownReportTests {
 //	}
 	
 //	@Test
+//	@Transactional
 //	public void insertBreakdownReport() {
-		
+//		
+//		Criteria cri = new Criteria();
+//		
 //		BreakdownReportVO data = new BreakdownReportVO();
-//		data.setBtitle("두번째 고장신고");
+//		data.setBtitle("N째 고장신고");
 //		data.setBikenum(81595L);
 //		data.setBrokenparts("타이어");
-//		data.setStationid("ST-18");
+//		data.setStationid("ST-52");
 //		data.setContent("타이어에 바람이 빠졌어요");
 //		data.setWriter("newbi");
-//		BreakdownReports.insertBreakdownReport(data);
-//		log.info(data);
+//		Long num = BreakdownReports.insertBreakdownReport(data);
+//		log.info("return value : "+num);
 //		log.info("===================== After Insert =============================");
-//		BreakdownReports.searchBreakdownReport().forEach(result -> log.info(result));
+//		BreakdownReports.searchBreakdownReport(cri).forEach(result -> log.info(result));
 //		log.info("================================================================");
 //	}
 
+	@Test
+	public void testGetMaxNum() {
+		log.info("===================== Get Max Num =============================");
+		Long returnNum = BreakdownReports.getMaxNum();
+		log.info("return num : "+returnNum);
+	}
+	
 //	@Test
 //	public void insertCustomBnumBreakdownReport() {
 //		Long loop=55L;
@@ -122,14 +133,14 @@ public class BreakdownReportTests {
 //		log.info("Total count : "+BreakdownReports.getTotalCount(data));
 //	}
 	
-	@Test
-	public void testUpdateBreakdownReport() {
-		BreakdownReportVO data = new BreakdownReportVO();
-		data.setBnum(20L);
-		data.setBrokenparts("핸들");
-		data.setWriter("수정자");
-		data.setContent("손접이 고무가 벗겨졌어요");
-		log.info("Outnum : "+BreakdownReports.updateBreakdownReport(data));
-	}
+//	@Test
+//	public void testUpdateBreakdownReport() {
+//		BreakdownReportVO data = new BreakdownReportVO();
+//		data.setBnum(20L);
+//		data.setBrokenparts("핸들");
+//		data.setWriter("수정자");
+//		data.setContent("손접이 고무가 벗겨졌어요");
+//		log.info("Outnum : "+BreakdownReports.updateBreakdownReport(data));
+//	}
 }
 

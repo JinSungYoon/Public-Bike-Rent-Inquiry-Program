@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@include file="../includes/header.jsp" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,6 +13,7 @@
 </head>
 
 <body>
+
 <div class="panel-body">
 	<table id="breakdownList" width="100%" class="table table-sriped table-boardered table-hover text-center">
 		<thead>
@@ -40,7 +42,22 @@
 				</tr>
 			</c:forEach>
 		</tbody>
-	</table>
+	</table><!-- End table -->
+	<!-- Modal 추가  -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:1050; visibility:visible;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel">Modal Screen</h4>
+				</div>
+				<div class="modal-body">처리가 완료되었습니다.</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Save changes</button> 
+				</div>
+			</div><!-- End modal-content -->
+		</div><!-- End modal-dialog -->
+	</div><!-- End Modal -->
 	<div class="pull-right">
 		<form id="searchPostForm" class="searchPostForm" action="/board/breakdownList" method="get" style="float:left;">
 			<input id="keyword" name="keyword" type="text" placeHolder="Search..." />
@@ -70,10 +87,33 @@
 </div>
 </body>
 <!-- JQuery -->
-<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 <script type="text/javascript">
 
 $(document).ready(function(){
+	
+	var returnNum = '<c:out value="${returnVal}"/>';
+	
+	checkModal(returnNum);
+	
+	function checkModal(returnNum){
+		if(returnNum === ''){
+			return;
+		}
+		
+		if(parseInt(returnNum)>0){
+			$(".modal-body").html("게시글 "+parseInt(returnNum)+" 번이 등록되었습니다.");
+			//alert("게시글 "+parseInt(returnNum)+"번이 등록되었습니다");
+		}
+		
+		$("#myModal").modal('show');
+
+	}
+	
+	//
 	var actionForm = $("#actionForm");
 	
 	$(".page-item a").on("click",function(e){
@@ -83,27 +123,11 @@ $(document).ready(function(){
 		actionForm.submit();
 	});
 	
-	
+	// 각각의 고장신고 세부항목으로 이동.
 	$("#breakdownList tr").click(function(){
 		console.log(this);
 		
 		var bnum = this.children[1].textContent;
-		/*
-		$.ajax({
-			url:'/board/getBreakdownReport',
-			data : {bnum : bnum},
-			type : 'GET',
-			error: function(){
-				alert("통신 실패");
-			},
-			success : function(result){
-				console.log(result);
-				//window.location.href = '/board/detailBreakdownReport';
-				//location.replace('/board/detailBreakdownReport');
-				location.href='/board/detailBreakdownReport';
-			}
-		});
-		*/
 		
 		actionForm.append("<input type='hidden' name='bnum' value='"+bnum+"'>");
 		actionForm.attr("action","/board/getBreakdownReport");
@@ -112,15 +136,15 @@ $(document).ready(function(){
 	});
 	
 	
+	// 게시글 조회
 	$(".btnSearch").on("click",function(e){
-    	//if(!$(".searchPostForm").find("#keyword").val()){
+    	
     	if(!$("#keyword").val()){
     		alert("검색어를 입력해주세요.");
     		return false;
     	}
     	
     	e.preventDefault();
-    	
     	
     	$.ajax({
 			url : '/board/breakdownList',
@@ -139,6 +163,7 @@ $(document).ready(function(){
 		}); //$.ajax
     });
 
+	// 게시글 작성 페이지로 이동.
 	$(".btnWrite").on("click",function(e){
 		e.preventDefault();
 		$.ajax({

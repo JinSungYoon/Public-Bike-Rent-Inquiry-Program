@@ -1,6 +1,7 @@
 package org.jindory.domain;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -15,4 +16,7 @@ public class BreakdownReportVO {
 	private String writer;
 	private Date createDate;
 	private Date updateDate;
+	
+	private List<BreakdownAttachVO> attachList;
+	
 }

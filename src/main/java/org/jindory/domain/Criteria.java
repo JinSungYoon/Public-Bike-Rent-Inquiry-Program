@@ -9,12 +9,13 @@ public class Criteria {
 	private String keyword;
 	
 	public Criteria() {
-		this(1,10);
+		this(1,10,"");
 	}
 	
-	public Criteria(int pageNum,int amount) {
+	public Criteria(int pageNum,int amount,String keyword) {
 		this.pageNum = pageNum;
 		this.amount = amount;
+		this.keyword = keyword;
 	}
 	
 }

@@ -12,7 +12,7 @@
 			WHERE ROWNUM BETWEEN 1 AND 100
 			
 			<if test="keyword != null ">
-				AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' )
+				AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' OR BTITLE LIKE '%'||#{keyword}||'%')
 			</if>
 
 			ORDER BY BNUM
@@ -27,9 +27,13 @@
 		ORDER BY BNUM
 	</select>
 	
+	<select id="getMaxNum" resultType="Long">
+		SELECT MAX(bnum) AS bnum FROM breakdown_report
+	</select>
+	
 	<insert id="insertBreakdownReport" parameterType="org.jindory.domain.BreakdownReportVO">
 		<selectKey keyProperty="bnum" order="BEFORE" resultType="long"> 
-			SELECT MAX(bnum)+1 from breakdown_report
+			SELECT MAX(bnum)+1 as bnum from breakdown_report
 		</selectKey>
 		INSERT INTO breakdown_report(bnum,btitle,bikenum,stationid,brokenparts,content,writer)
 		VALUES(#{bnum},#{btitle},#{bikenum},#{stationid},#{brokenparts},#{content},#{writer})
@@ -91,7 +95,7 @@
 		FROM breakdown_report 
 		WHERE 1=1
 		<if test="keyword != null ">
-			AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' )
+			AND (CONTENT LIKE '%'||#{keyword}||'%' OR BROKENPARTS LIKE '%'||#{keyword}||'%' OR BTITLE LIKE '%'||#{keyword}||'%')
 		</if>
 		ORDER BY BNUM DESC
 	</select>

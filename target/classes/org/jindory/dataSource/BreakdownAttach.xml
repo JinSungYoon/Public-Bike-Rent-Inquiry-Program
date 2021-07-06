@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jindory.dataSource.BreakdownAttach">
+
+	<insert id="insertBreakdownAttach">
+		INSERT INTO breakdown_attach(uuid,uploadPath,filename,filetype,bnum)
+		VALUES (#{uuid},#{uploadPath},#{fileName},#{fileType},#{bnum})
+	</insert>
+	<delete id="deleteBreakdownAttach">
+		DELETE breakdown_attach WHERE uuid = #{uuid}
+	</delete>
+	<select id="searchByBnum" resultType="org.jindory.domain.BreakdownAttachVO">
+		SELECT * from breakdown_attach WHERE bnum = #{bnum}
+	</select>
+	<delete id="deleteAllAttach">
+		DELETE breakdown_attach WHERE bnum = #{bnum}
+	</delete>
+</mapper>

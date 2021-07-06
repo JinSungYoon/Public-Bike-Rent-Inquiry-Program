@@ -15,6 +15,8 @@ public interface BreakdownReport {
 	
 	public int getTotalCount(Criteria cri);
 	
+	public Long getMaxNum();
+	
 	public List<BreakdownReportVO> searchBreakdownReport(Criteria cri);
 	
 	public Long insertBreakdownReport(BreakdownReportVO data);
