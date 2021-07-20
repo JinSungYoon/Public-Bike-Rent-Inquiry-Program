@@ -167,6 +167,10 @@ $(document).ready(function(){
 			data : {fileName : targetFile,type:type,fileIndex:fileIndex},
 			dataType : 'text',
 			type : 'POST',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			success : function(result){
 				alert(result);
 				// 삭제된 파일의 인덱스 찾기
@@ -245,6 +249,10 @@ $(document).ready(function(){
 			data : formData,
 			type : 'POST',
 			dataType : 'json',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			success : function(result){
 				console.log(result);
 				showUploadFile(result);
@@ -276,6 +284,10 @@ $(document).ready(function(){
 				url:'/board/deleteBreakdownReport',
 				data : {bnum:$("input[name=bnum]").val()},
 				type:'POST',
+				beforeSend : function(xhr)
+	            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+	                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	            },
 				error : function(e){
 					alert("통신 실패 : "+e);
 				},
@@ -323,6 +335,10 @@ $(document).ready(function(){
 				data : JSON.stringify(param),
 				contentType : 'application/json',
 				type : 'POST',
+				beforeSend : function(xhr)
+	            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+	                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	            },
 				dataType : "text",
 				error : function(e){
 					console.log(e);

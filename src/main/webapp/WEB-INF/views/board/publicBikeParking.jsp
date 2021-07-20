@@ -25,6 +25,7 @@
 	<form id="searchPlaceForm" class="searchPlaceForm" action="/board/searchPlace" method="post">
 		<input id="placeName" name="placeName" type="text" placeHolder="검색할 지역" />
 		<input id="dataSubmit" type="button" value="지역명검색"/>
+		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 	</form>
 </div>
 <div class="panel-body">
@@ -122,7 +123,8 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			parkingList = result;
 			setupMarker(parkingList);
 		}
-		,beforeSend:function(){
+		,beforeSend:function(xhr){
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
 			LoadingWithMask();
 		},
 		complete:function(){
@@ -374,6 +376,10 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			data : {placeName:searchPlaceFormObj.find("#placeName").val()},		
 			dataType : "json",
 			type : 'POST',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			error : function(){
 				alert("통신 실패");
 			},
@@ -401,6 +407,10 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			data : {placeName:searchPlaceFormObj.find("#placeName").val()},		
 			dataType : "json",
 			type : 'POST',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			error : function(){
 				alert("통신 실패");
 			},

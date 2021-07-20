@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- CustomUserDetailsService가 어디에 정의되어 있는지 정의  -->
+	<bean id="customAccessDenied" class="org.jindory.security.CustomAccessDeniedHandler"/>
+	<bean id="customUserDetailsService" class="org.jindory.security.CustomUserDetailsService"/>
+	<bean id="customUserLoginFailHandler" class="org.jindory.security.CustomUserLoginFailHandler"/>
+	<bean id="customUserLoginSuccessHandler" class="org.jindory.security.CustomUserLoginSuccessHandler"/>
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+	
+	
+	<security:http>
+	
+		<!-- 정적 리소스는 모두 접근 허용 -->
+		<security:intercept-url pattern="/resources/**" access="permitAll" />
+
+		<!-- 로그인된 상태에서는 로그인이나 회원가입 화면에 접근 못하도록 함 -->
+		<security:intercept-url pattern="/loginView" access="isAnonymous()" />
+		<security:intercept-url pattern="/registerUserView" access="isAnonymous()" />
+
+		<!-- 관리자페이지는 관리자만 접근 허용 -->
+		<security:intercept-url pattern="/admin/**" access="hasRole('ADMIN')" />
+		
+		<security:form-login 
+			login-page="/member/loginView"
+			username-parameter="memberId"
+			password-parameter="memberPw"
+			authentication-failure-handler-ref="customUserLoginFailHandler"
+			authentication-success-handler-ref="customUserLoginSuccessHandler"/>
+		
+		<security:logout 
+			logout-url="/member/logout"
+			invalidate-session="true"
+			delete-cookies="remember-me,JESSION_ID"
+		/>
+		
+		<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+		
+		<!-- 권한이 없어서 금지된 URI 접속할 때 보여줄 페이지(403 에러 페이지 대체)-->
+		<security:access-denied-handler ref="customAccessDenied" />
+	
+	</security:http>	
+	
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="customUserDetailsService">
+			<security:password-encoder ref="bcryptPasswordEncoder"/>
+		</security:authentication-provider>
+		
+	</security:authentication-manager>
+	
+</beans>

@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,8 +31,16 @@
       </form>
 
       <div class="text-end">
-        <button type="button" class="btn btn-outline-light me-2">Login</button>
-        <button type="button" class="btn btn-warning">Sign-up</button>
+      	<sec:authorize access="isAuthenticated()">
+      		<sec:authentication property="principal.membername" var="member_name"/>
+      		<div id="member_name">${member_name}님</div>
+      		<button type="button" class="btn btn-light" onClick="location.href='/member/logout'">Logout</button>
+      		<button type="button" class="btn btn-warning" onClick="location.href='/member/myInfo'">My Info</button>
+      		</sec:authorize>
+      	<sec:authorize access="isAnonymous()">
+	        <button type="button" class="btn btn-light" onClick="location.href='/member/loginView'">Login</button>
+	        <button type="button" class="btn btn-warning" onClick="location.href='/member/registerUserView'">Sign-up</button>
+        </sec:authorize>
       </div>
     </div>
   </div>

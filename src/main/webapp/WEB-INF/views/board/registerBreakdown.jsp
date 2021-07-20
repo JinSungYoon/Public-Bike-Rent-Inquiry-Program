@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp" %>
 <!DOCTYPE html>
 <html>
@@ -49,7 +50,13 @@
                          </div>
                          <div class="form-group">
                              <label>작성자</label>
-                             <input class="form-control" name="writer">
+                             <sec:authorize access="isAuthenticated()">
+	                             <sec:authentication property="principal.membername" var="member_name"/>
+	                             <input class="form-control" name="writer" value="${member_name}" readonly>
+                             </sec:authorize>
+                              <sec:authorize access="isAnonymous()">
+                              <input class="form-control" name="writer">
+                              </sec:authorize>
                          </div>
                          <div class="form-group">
                              <label>내용</label>
@@ -57,6 +64,7 @@
                          </div>
                      	<button type="register" class="btnSubmit">생성</button>
                      	<button type="delete" class="btnCancel">취소</button>
+                     	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                      </form>
                  </div>
                  <!-- /.panel-body -->
@@ -277,6 +285,10 @@ $(document).ready(function(){
 			data : formData,
 			type : 'POST',
 			dataType : 'json',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			success : function(result){
 				console.log(result);
 				showUploadFile(result);
@@ -325,6 +337,10 @@ $(document).ready(function(){
 			data : {fileName : targetFile,type:type,fileIndex:fileIndex},
 			dataType : 'text',
 			type : 'POST',
+			beforeSend : function(xhr)
+            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            },
 			success : function(result){
 				alert(result);
 				// 삭제된 파일의 인덱스 찾기
