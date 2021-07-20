@@ -127,6 +127,6 @@
 
   gtag('config', 'UA-23581568-13');
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"66e2482a2da6051b","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2021.6.0","si":10}'></script>
+
 </body>
 </html>
