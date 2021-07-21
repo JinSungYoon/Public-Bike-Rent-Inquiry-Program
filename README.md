@@ -10,12 +10,12 @@
 
 - 자전거 대여소 조회
 
-![publicBikeRentInquiryLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/publicBikeRentInquiryLayout.jpg)
+![publicBikeRentInquiryLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Project%20Intorduce/publicBikeRentInquiryLayout.jpg)
 
 - 고장신고 리스트
-  ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/breakdownReportLayout.JPG)
+  ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/imgProject%20Intorduce/breakdownReportLayout.JPG)
 - 고장신고 등록,수정,삭제
-  ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/breakdownReportDetailLayout.JPG)
+  ![breakdownReportLayout](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/imgProject%20Intorduce/breakdownReportDetailLayout.JPG)
 
 현재 구현된 기능은 서울시 공공데이터 현황을 조회하여 조회된 자전거 대여소의 위치를 지도에 보여주고 있습니다.
 
