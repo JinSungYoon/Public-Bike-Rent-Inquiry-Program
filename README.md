@@ -41,22 +41,22 @@
 
    - https://www.oracle.com/java/technologies/javase-downloads.html에 접속하여 JDK 1.8버전 다운로드
 
-     ![image-20210722052308775](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk download.JPG)
+     ![jdk download](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk download.JPG)
      실제로 설치된 JDK 버전은 아래와 같으나 1.8 버젼이면 상관없다.
-     ![image-20210722052603618](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk version.JPG)
+     ![jdk version](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk version.JPG)
 
    - 환경변수 설정
      내PC에서 [우클릭]-[속성] -> 고급 시스템 설정 클릭 -> [고급] -> [환경변수] -> 시스템변수에 새로만들기
      변수 이름 : JAVA_HOME
      변수값 : JDK 설치경로 입력
-     ![image-20210722053245174](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/system variable setting.JPG) 
+     ![system variable setting](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/system variable setting.JPG) 
 
 2. Tomcat 다운로드
    http://tomcat.apache.org/에 들어가서 9.0 이상의 버젼 설치
 
    버젼 : 9.0 version
-   Eclipse에서 Window>Preferenes Server>Runtime Environment에서 Apache Tomcat 9를 선택하고 설치된 경로 지정<img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/server setup1.JPG" alt="image-20210722054131780" style="zoom: 50%;" />
-   <img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development/Environment Setting/server setup2.JPG" alt="image-20210722053848141" style="zoom: 50%;" /><img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development/Environment Setting/server setup3.JPG" alt="image-20210722054045814" style="zoom: 50%;" />
+   Eclipse에서 Window>Preferenes Server>Runtime Environment에서 Apache Tomcat 9를 선택하고 설치된 경로 지정<img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/server setup1.JPG" alt="server setup1" style="zoom: 50%;" />
+   <img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development/Environment Setting/server setup2.JPG" alt="server setup2" style="zoom: 50%;" /><img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development/Environment Setting/server setup3.JPG" alt="server setup3" style="zoom: 50%;" />
 
 
 
