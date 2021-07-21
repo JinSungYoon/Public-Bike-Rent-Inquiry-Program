@@ -43,7 +43,7 @@
 
      ![jdk download](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk download.JPG)
      실제로 설치된 JDK 버전은 아래와 같으나 1.8 버젼이면 상관없다.
-     ![jdk version](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development Environment Setting/jdk version.JPG)
+     ![jdk version](https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development%20Environment%20Setting/jdk%20version.JPG)
 
    - 환경변수 설정
      내PC에서 [우클릭]-[속성] -> 고급 시스템 설정 클릭 -> [고급] -> [환경변수] -> 시스템변수에 새로만들기
