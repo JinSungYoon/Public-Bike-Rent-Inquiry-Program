@@ -35,9 +35,8 @@
 - 현 위치를 기반으로 한 가장 가까운 자전거 대여소 조회
 - 대여소 선택시 게시글 등록 및 수정
 <summary>개발 환경설정</summary>    
-<div markdown="1">
+<div markdown="2">
 1. JDK 설치
-
 
    - https://www.oracle.com/java/technologies/javase-downloads.html에 접속하여 JDK 1.8버전 다운로드
 
