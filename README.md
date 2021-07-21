@@ -34,6 +34,9 @@
 
 - 현 위치를 기반으로 한 가장 가까운 자전거 대여소 조회
 - 대여소 선택시 게시글 등록 및 수정
+    </div>
+</details>
+<details>
 <summary>개발 환경설정</summary>    
 <div markdown="2">
 1. JDK 설치
@@ -56,10 +59,5 @@
    버젼 : 9.0 version
    Eclipse에서 Window>Preferenes Server>Runtime Environment에서 Apache Tomcat 9를 선택하고 설치된 경로 지정<img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development%20Environment%20Setting/server%20setup1.JPG" alt="server setup1" style="zoom: 50%;" />
    <img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development%20Environment%20Setting/server%20setup2.JPG" alt="server setup2" style="zoom: 50%;" /><img src="https://github.com/JinSungYoon/Public-Bike-Rent-Inquiry-Program/blob/master/img/Development%20Environment%20Setting/server%20setup3.JPG" alt="server setup3" style="zoom: 50%;" />
-
-
-
-
     </div>
-
 </details>
