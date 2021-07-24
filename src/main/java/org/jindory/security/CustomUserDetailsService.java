@@ -25,7 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		//log.warn("Load user by username : "+username);
 		
 		// 최종적으로 리턴해야할 객체
 		UserDetailsVO UserDetails = new UserDetailsVO();
@@ -37,12 +36,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 			return null;
 		}else {
 			
-			// BcryptPasswordEncoder encoding
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-	        String encodedPassword = passwordEncoder.encode(memberInfo.getMemberPw());
-			
 			UserDetails.setUsername(memberInfo.getMemberId());
-			UserDetails.setPassword(encodedPassword);
+			UserDetails.setPassword(memberInfo.getMemberPw());
 			UserDetails.setMembername(memberInfo.getMemberName());
 			
 			List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();

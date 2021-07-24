@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,28 +33,28 @@ public class PublicBikeMemberController {
 	@Autowired
 	private PublicBikeMemberServiceImpl publicBikeMemberService;
 	
-	//@Autowired
-	//BCryptPasswordEncoder pwdEncoder;
+	@Autowired
+	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
-	@GetMapping("/registerUser")
+	@GetMapping("/registerUserView")
 	public String getRegister() throws Exception{
 		log.info("Get Register");
-		return "/member/registerUser";
+		return "/member/registerUserView";
 	}
 	
-	@RequestMapping(value="/registerUser", produces="text/plain;charset=UTF-8", method=RequestMethod.POST)
+	@RequestMapping(value="/registerUserView", produces="text/plain;charset=UTF-8", method=RequestMethod.POST)
 	@ResponseBody
 	public String postRegister(@RequestBody PublicBikeMemberVO member)throws Exception{
 		
 		// 비밀번호 암호화
-		//member.setMemberPw(pwdEncoder.encode(member.getMemberPw()));
+		member.setMemberPw(passwordEncoder.encode(member.getMemberPw()));
 		
 		Long resultVal = publicBikeMemberService.register(member);
 		String returnMsg= "";
 		if(resultVal.equals(1L)) {
-			returnMsg = member.getMemberId()+"가 성공적으로 등록되었습니다.";
+			returnMsg = member.getMemberId();
 		}else {
-			returnMsg = "등록에 실패했습니다.";
+			returnMsg = null;
 		}
 		return returnMsg;
 	}
@@ -70,8 +71,10 @@ public class PublicBikeMemberController {
 		}else if(!uri.contains("/loginView")) {
 			request.getSession().setAttribute("prevPage",
 					request.getHeader("Referer"));
+		}else if(uri.contains("/registerUserView")) {
+			request.getSession().setAttribute("prevPage",
+					"/board/publicBikeParking");
 		}
-
 		return "/member/loginView";
 	}
 
@@ -80,8 +83,12 @@ public class PublicBikeMemberController {
 	public String logout(HttpSession session) throws Exception{
 		
 		session.invalidate();
-		
 		return "redirect:/member/loginView";
+	}
+	
+	@GetMapping("/mypageView")
+	public void logoutGet() {
+		log.info("mypageView");
 	}
 	
 	@GetMapping("/checkId")
@@ -89,7 +96,6 @@ public class PublicBikeMemberController {
 	public String getCheckIdResult(@RequestParam("memberId") String memberId)throws Exception{
 		
 		String result = publicBikeMemberService.checkId(memberId);
-		
 		// 만일 해당 Id가 존재한다면 result갑 반환 없다면 pass 반환.
 		result = result == null ? "pass" : result;
 		
@@ -108,10 +114,5 @@ public class PublicBikeMemberController {
 		log.info("access Denied "+auth);
 		model.addAttribute("msg","Access Denied");
 	}
-	/*
-	@GetMapping("/logout")
-	public void logoutGet() {
-		log.info("custom logout");
-	}
-	*/
+	
 }

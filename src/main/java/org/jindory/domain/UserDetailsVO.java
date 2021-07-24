@@ -14,6 +14,8 @@ public class UserDetailsVO implements UserDetails{
 	private String username;
 	private String password;
 	private String membername;
+	private String memberphone;
+	private String memberberth;
 	private List<GrantedAuthority> authorities;
 	
 	@Override

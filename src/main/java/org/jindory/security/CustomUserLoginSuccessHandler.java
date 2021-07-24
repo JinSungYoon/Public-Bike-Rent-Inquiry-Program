@@ -59,7 +59,6 @@ public class CustomUserLoginSuccessHandler implements AuthenticationSuccessHandl
 		
 		
 		/* 로그인 버튼 눌러 접속했을 경우의 데이터 get */ 
-		
 		String prevPage = (String) request.getSession().getAttribute("prevPage");
 		
 		if(prevPage != null) {

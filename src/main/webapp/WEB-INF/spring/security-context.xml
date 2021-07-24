@@ -7,6 +7,7 @@
 	<!-- CustomUserDetailsService가 어디에 정의되어 있는지 정의  -->
 	<bean id="customAccessDenied" class="org.jindory.security.CustomAccessDeniedHandler"/>
 	<bean id="customUserDetailsService" class="org.jindory.security.CustomUserDetailsService"/>
+	<bean id="customUserLoginAuthenticationProvider" class="org.jindory.security.CustomUserLoginAuthenticationProvider"/>
 	<bean id="customUserLoginFailHandler" class="org.jindory.security.CustomUserLoginFailHandler"/>
 	<bean id="customUserLoginSuccessHandler" class="org.jindory.security.CustomUserLoginSuccessHandler"/>
 	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
@@ -44,11 +45,10 @@
 	
 	</security:http>	
 	
+	<!-- DB 연동 설정  -->
 	<security:authentication-manager>
-		<security:authentication-provider user-service-ref="customUserDetailsService">
-			<security:password-encoder ref="bcryptPasswordEncoder"/>
+		<security:authentication-provider ref="customUserLoginAuthenticationProvider">
 		</security:authentication-provider>
-		
 	</security:authentication-manager>
 	
 </beans>

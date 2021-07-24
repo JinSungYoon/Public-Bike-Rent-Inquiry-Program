@@ -3,7 +3,7 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jindory.dataSource.PublicBikeMember">
-	<insert id = "register">
+	<insert id = "registerUserInfo">
 		INSERT INTO PUBLIC_BIKE_MEMBER(
 										MEMBER_ID,
 								        MEMBER_PW,
@@ -26,6 +26,21 @@
 										#{memberBerth},
 										#{memberRole},
 										'Y',
+										SYSDATE,
+										SYSDATE
+								)
+	</insert>
+	
+	<insert id = "registerUserAuth">
+		INSERT INTO PUBLIC_BIKE_MEMBER_AUTH(
+										MEMBER_ID,
+										AUTH,
+										CREATE_DATE,
+										UPDATE_DATE
+								    	)
+								VALUES(
+										#{memberId},
+										#{auth},
 										SYSDATE,
 										SYSDATE
 								)
@@ -58,12 +73,6 @@
 		<result property="memberId" column="member_id"/>
 		<result property="auth" column="auth"/>
 	</resultMap>
-	
-	<!-- select id="read" resultMap="memberMap">
-		SELECT mem.MEMBER_ID as memberId,mem.MEMBER_PW as memberPw, mem.MEMBER_NAME as memberName, mem.CREATE_DATE as createDate, mem.UPDATE_DATE as updateDate, auth.auth
-		FROM PUBLIC_BIKE_MEMBER mem LEFT OUTER JOIN PUBLIC_BIKE_MEMBER_AUTH auth ON mem.MEMBER_ID = auth.MEMBER_ID
-		WHERE mem.MEMBER_ID = #{memberId}
-	</select-->
 	
 	<select id="read" resultMap="memberMap">
 		SELECT mem.MEMBER_ID, mem.MEMBER_PW, mem.MEMBER_NAME, mem.CREATE_DATE, mem.UPDATE_DATE, auth.auth

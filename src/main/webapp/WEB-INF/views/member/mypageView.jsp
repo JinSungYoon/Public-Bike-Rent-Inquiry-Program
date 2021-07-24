@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@include file="../includes/header.jsp" %>
 <!DOCTYPE html>
 <html>
@@ -11,10 +12,13 @@
 </head>
 <body>
 	 <div class="panel-body">
-         <form id="postForm" action="/member/registerUserView" method="POST">
+         <form id="postForm">
          	<div class="form-group">
                  <label>아이디(이메일)</label>
-                 <input type="text" class="form-control" name="memberId" placeholder="이메일 형식으로 입력해주세요">
+                 <sec:authorize access="isAuthenticated()">
+                 	<sec:authentication property="principal.username" var="memberId"/>
+                   	<input class="form-control" name="memberId" value="${memberId}" readonly>
+                 </sec:authorize>
              </div>
              <div class="form-group">
                  <label>비밀번호</label>
@@ -22,17 +26,15 @@
              </div>
              <div class="form-group">
                  <label>이름</label>
-                 <input class="form-control" name="memberName">
+                 <sec:authorize access="isAuthenticated()">
+                 	<sec:authentication property="principal.membername" var="memberName"/>
+                   	<input class="form-control" name="memberName" value="${memberName}" readonly>
+                 </sec:authorize>
              </div>
-             <div class="form-group" id="genderInput">
-                 <label>성별</label>
-                 <input type="radio" name="gender" value="M">남
-                 <input type="radio" name="gender" value="F">여
-             </div>
-             <div class="form-group">
-                 <label>연락처</label>
-                 <input class="form-control" name="memberPhone">
-             </div>
+             <sec:authorize access="isAuthenticated()">
+                 <sec:authentication property="principal.memberphone" var="memberPhone"/>
+                   	<input class="form-control" name="memberPhone" value="${memberPhone}">
+             </sec:authorize>
              <div class="form-group">
                  <label>주소</label>
                  <input type="text" id="postCode" placeholder="우편번호">
@@ -45,14 +47,17 @@
              </div>
              <div class="form-group">
                  <label>생년월일</label>
-                 <input class="form-control" name="memberBerth">
+                 <sec:authorize access="isAuthenticated()">
+                 <sec:authentication property="principal.memberbirth" var="memberBirth"/>
+                   	<input class="form-control" name="memberBirth" value="${memberBirth}">
+             	 </sec:authorize>
              </div>
              <div class="form-group">
                  <label>관리자코드</label>
                  <input class="form-control" name="memberRoleCode">
              </div>
          </form>
-         <button type="register" class="btnSubmit">생성</button>
+         <button type="update" class="btnSubmit">업데이트</button>
          <button type="delete" class="btnCancel">취소</button>
      </div>
      <!-- /.panel-body -->
@@ -117,37 +122,6 @@ function execDaumPostcode(){
 }
 $(document).ready(function(){	
 	
-	var memberIdExp = new RegExp(/[a-zA-z0-9?]+@{1,1}[a-zA-z0-9?]+.{1,1}[a-zA-z0-9?]+/gm);
-	
-	$("input[name='memberId']").on("change",function(){
-		console.log($("input[name='memberId']").val());
-		var memberId = $("input[name='memberId']").val();
-		
-		var valid = memberIdExp.test(memberId);
-		
-		if(valid){
-			console.log("Pass : "+$("input[name='memberId']").val());	
-			$.ajax({
-				url:'/member/checkId',
-				data : {memberId:$("input[name='memberId']").val()},
-				type : 'GET',
-				//dataType : 'text',
-				success : function(result){
-					if(result=="pass"){
-						alert("등록 가능한 이메일입니다.");
-					}else{
-						alert("현재 존재하는 이메일입니다.");
-						$("input[name='memberId']").val("");	
-					}
-				}
-			})
-		}else{
-			alert("ID 형식이 맞지 않습니다(이메일 형식을 입력해주세요)");
-		}
-		
-	});
-	
-	
 	$(".btnSubmit").on("click",function(){
 		
 		var memberId = $("input[name=memberId]").val();
@@ -162,7 +136,7 @@ $(document).ready(function(){
 		var params = {memberId : memberId,memberPw : memberPw, memberName : memberName,memberGender : memberGender,memberAddress : memberAddress,memberPhone : memberPhone, memberBerth : memberBerth,memberRole : memberRole};
 		
 		$.ajax({
-			url:'/member/registerUserView',
+			url:'/member/updateUser',
 			data : JSON.stringify(params),
 			type : "POST",
 			contentType : 'application/json',
@@ -174,12 +148,7 @@ $(document).ready(function(){
 				alert("Error : "+e);
 			},
 			success : function(result){
-				if(result.search("@")>-1){
-					alert(result+"이 성공적으로 등록되었습니다.");
-					window.location.replace("/member/loginView");
-				}else{
-					alert("등록에 실패했습니다.");
-				}
+				alert(result);
 			}
 		});
 	});

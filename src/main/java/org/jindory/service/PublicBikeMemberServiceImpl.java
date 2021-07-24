@@ -3,6 +3,7 @@ package org.jindory.service;
 import org.jindory.dataSource.BreakdownAttach;
 import org.jindory.dataSource.BreakdownReport;
 import org.jindory.dataSource.PublicBikeMember;
+import org.jindory.domain.PublicBikeMemberAuthVO;
 import org.jindory.domain.PublicBikeMemberVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,18 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 	
 	@Override
 	public Long register(PublicBikeMemberVO member) {
-		Long resultVal = publicBikeMember.register(member);
+		PublicBikeMemberAuthVO auth = new PublicBikeMemberAuthVO();
+		if(member.getMemberRole().equals("따릉이")) {
+			member.setMemberRole("관리자");
+			auth.setMemberId(member.getMemberId());
+			auth.setAuth("ADMIN");
+		}else {
+			member.setMemberRole("이용자");
+			auth.setMemberId(member.getMemberId());
+			auth.setAuth("MEMBER");
+		}
+		Long resultVal = publicBikeMember.registerUserInfo(member);
+		Long result = publicBikeMember.registerUserAuth(auth);
 		return resultVal;
 	}
 
