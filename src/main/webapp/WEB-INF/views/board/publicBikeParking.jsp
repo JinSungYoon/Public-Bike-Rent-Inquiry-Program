@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@include file="/WEB-INF/views/globalVariable.jsp"%>
-<%@include file="../includes/header.jsp" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+<%@ include file="../includes/header.jsp" %>
+<%@ include file="/WEB-INF/views/globalVariable.jsp"%>
 <%@ page session="false" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -11,6 +12,10 @@
 <title>서울시 따릉이 자전거</title>
 	<!-- Bootstrap 4 -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	<!--  date timepicker를 사용하기 위한 css -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.0.0/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+	<!-- css -->
+	<link rel="stylesheet" href="/resources/css/detailBreakdownReport.css" type="text/css">
 </head>
 <body>
 <h1>실시간 공공자전거 대여현황</h1>
@@ -23,67 +28,119 @@
 
 <div class="searchPlaceDiv">
 	<form id="searchPlaceForm" class="searchPlaceForm" action="/board/searchPlace" method="post">
-		<input id="placeName" name="placeName" type="text" placeHolder="검색할 지역" />
+		<input id="placeName" name="placeName" type="text" placeHolder="검색할 지역"/>
 		<input id="dataSubmit" type="button" value="지역명검색"/>
 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 	</form>
 </div>
 <div class="panel-body">
-	<table id="bikeParkingTable" width="100%" class="table table-sriped table-boardered table-hover text-center">
-		<thead>
-			<tr>
-				<th>No.</th>
-				<th>거치대 개수</th>
-				<th>대여소 이름</th>
-				<th>주차대수</th>
-				<th>거치율</th>
-				<th>거치대 위도</th>
-				<th>거치대 경도</th>
-				<th>대여소 ID</th>
-				<th>상세정보</th>
-			</tr>
-		</thead>
-		<tbody>
-			<c:forEach var="item" items="${result}" varStatus="vs">
-				<tr class="bikeParkInfo${vs.index}">
-					<td class="index"><c:out value="${vs.count}"/></td>
-					<td class="rackTotCnt"><c:out value="${item.rackTotCnt}"/></td>
-					<td class="stationName"><c:out value="${item.stationName}"/></td>
-					<td class="parkingBikeTotCnt"><c:out value="${item.parkingBikeTotCnt}"/></td>
-					<td class="shared"><c:out value="${item.shared}"/></td>
-					<td class="stationLatitude"><c:out value="${item.stationLatitude}"/></td>
-					<td class="stationLongitude"><c:out value="${item.stationLongitude}"/></td>
-					<td class="stationId"><c:out value="${item.stationId}"/></td>
-					<td class="arrow"><button class="accordion">▼</button></td>
+	<sec:authorize access="isAuthenticated()">
+	<sec:authentication property="principal.username" var="memberId"/>
+		<span id="memberId" hidden="true">${memberId}</span>
+		<span><button id="btnAdd">추가</button><button id="btndelete">삭제</button><button id="btnSave">저장</button></span>
+		<table id="favoritesTable" width="100%" class="table table-sriped table-boardered table-hover text-center">
+			<thead>
+				<tr>
+					<th></th>
+					<th>No.</th>
+					<th>대여소 ID</th>
+					<th>대여소 이름</th>
+					<th>알림 자전거 대수</th>
+					<th>알림 범위</th>
+					<th>알림 시간1</th>
+					<th>알림 시간2</th>
+					<th>알림 시간3</th>
+					<th>알림유효 시간</th>
+					<th>활성화 여부</th>
 				</tr>
-				<tr class="fold" style="display:none;">
-					<td colspan="9">
-						<c:set var="index" value="${vs.index}"/>
-						<!-- c:if test="${empty breakdownReport[index].getStationid()}" -->
-						<div class="fold-content">
-							<h3>Hello world</h3>
-							<span>${breakdownCount.get(index).get("STATIONID")}</span>
-							<span>${breakdownCount.get(index).get("CNT")}</span>
-						</div>
-						<!-- /c:if -->
-					</td>
+			</thead>
+			<tbody>
+				<c:forEach var="item" items="${favorites}" varStatus="vs">
+					<tr class="bikeParkInfo${vs.index}">
+						<td class="delYn"><input type="checkbox"/></td>
+						<td class="index"><c:out value="${vs.count}"/></td>
+						<td class="stationId"><input id="stationId" class="stationId" value = "<c:out value="${item.stationId}"/>" readonly></input></td>
+						<td class="stationName">
+							<input type="text" id="stationInput" list="stationComboList" value="<c:out value="${item.stationName}"/>"></input>
+							<datalist id="stationComboList" class="stationComboList">
+							</datalist>
+						</td>
+						<td class="noticeBikeNum"><input type="text" id="noticeBikeNum" value = "<c:out value="${item.noticeBikeNum}"/>"></input></td>
+						<td class="noticeScope"><input type="text" id="noticeScope" value = "<c:out value="${item.noticeScope}"/>"></input></td>
+						<td class="noticeTime1"><input type="time" id="noticeTime1" value = "<c:out value="${item.noticeTime1}"/>"></input></td>
+						<td class="noticeTime2"><input type="time" id="noticeTime2" value = "<c:out value="${item.noticeTime2}"/>"></input></td>
+						<td class="noticeTime3"><input type="time" id="noticeTime3" value= "<c:out value="${item.noticeTime2}"/>"></input></td>
+						<td class="effectiveDate"><input type="datetime-local" id="effectiveDate" value="<c:out value="${item.effectiveDate}"/>"></input></td>
+						<td class="activeYn">
+							<input type="text" id="activeYn" list="activeCondition" value="<c:out value="${item.activeYn}"/>"></input>
+							<datalist id="activeCondition">
+								<option value="Y">Y</option>
+								<option value="N">N</option>
+							</datalist>
+						</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+		<div class="pull-left">
+			<ul class="pagination">
+				<c:if test="${pageMarker.prev}">
+					<li class="page-item"><a class="page-link" href="${pageMarker.startPage-1}">«</a></li>
+				</c:if>
+				<c:forEach var="num" begin="${pageMarker.startPage}" end="${pageMarker.endPage}">
+					<li class="page-item"><a class="page-link ${pageMarker.cri.pageNum == num ? "active":""}" href="${num}">${num}</a></li>
+				</c:forEach>
+				<c:if test="${pageMarker.next}">
+					<li class="page-item"><a class="page-link" href="${pageMarker.endPage+1}">»</a></li>
+				</c:if>
+			</ul>
+		</div>
+		
+	</sec:authorize>
+	<sec:authorize access="isAnonymous()">
+		<table id="bikeParkingTable" width="100%" class="table table-sriped table-boardered table-hover text-center">
+			<thead>
+				<tr>
+					<th>No.</th>
+					<th>거치대 개수</th>
+					<th>대여소 이름</th>
+					<th>주차대수</th>
+					<th>거치율</th>
+					<th>거치대 위도</th>
+					<th>거치대 경도</th>
+					<th>대여소 ID</th>
+					<th>상세정보</th>
 				</tr>
-			</c:forEach>
-		</tbody>
-	</table>
-	<div class="pull-left">
-		<ul class="pagination">
-			<c:if test="${pageMarker.prev}">
-				<li class="page-item"><a class="page-link" href="${pageMarker.startPage-1}">«</a></li>
-			</c:if>
-			<c:forEach var="num" begin="${pageMarker.startPage}" end="${pageMarker.endPage}">
-				<li class="page-item"><a class="page-link ${pageMarker.cri.pageNum == num ? "active":""}" href="${num}">${num}</a></li>
-			</c:forEach>
-			<c:if test="${pageMarker.next}">
-				<li class="page-item"><a class="page-link" href="${pageMarker.endPage+1}">»</a></li>
-			</c:if>
-		</ul>
-	</div>
+			</thead>
+			<tbody id="stationList">
+				<c:forEach var="item" items="${stationList}" varStatus="vs">
+					<tr class="bikeParkInfo${vs.index}">
+						<td class="index"><c:out value="${vs.count}"/></td>
+						<td class="rackTotCnt"><c:out value="${item.rackTotCnt}"/></td>
+						<td class="stationName"><c:out value="${item.stationName}"/></td>
+						<td class="parkingBikeTotCnt"><c:out value="${item.parkingBikeTotCnt}"/></td>
+						<td class="shared"><c:out value="${item.shared}"/></td>
+						<td class="stationLatitude"><c:out value="${item.stationLatitude}"/></td>
+						<td class="stationLongitude"><c:out value="${item.stationLongitude}"/></td>
+						<td class="stationId"><c:out value="${item.stationId}"/></td>
+						<td class="arrow"><button class="accordion">▼</button></td>
+					</tr>
+					<tr class="fold" style="display:none;">
+						<td colspan="9">
+							<c:set var="index" value="${vs.index}"/>
+							<!-- c:if test="${empty breakdownReport[index].getStationid()}" -->
+							<div class="fold-content">
+								<h3>Hello world</h3>
+								<span>${breakdownCount.get(index).get("STATIONID")}</span>
+								<span>${breakdownCount.get(index).get("CNT")}</span>
+							</div>
+							<!-- /c:if -->
+						</td>
+					</tr>
+				</c:forEach>
+			</tbody>
+		</table>
+	</sec:authorize>
 	<!-- end pagenation -->
 	<form id="actionForm" action="/board/publicBikeParking" method='get'>
 		<input type='hidden' name='pageNum' value='${pageMarker.cri.pageNum}'>
@@ -99,13 +156,20 @@
 <script type="text/javascript">
 
 var map = "";			// map 전역
-var marker = "";		//marker 전역
+var marker = "";		//marker 전역 
 var markers = [];		// marker 위치를 저장하기 위한 배열
 var infoWindows = [];	// information을 저장하기 위한 배열
 var parkingList;
+var latitude = "";
+var longitude = "";
+var stationList = [];
+var displayNum = 10;
 
 window.onload = function(){	//html 로딩 이후에 시작
-	
+	navigator.geolocation.getCurrentPosition(function(pos) {
+		latitude = pos.coords.latitude;
+		longitude = pos.coords.longitude;
+	});
 };
 
 $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
@@ -122,6 +186,58 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			console.log("Success laod public bike parking list");
 			parkingList = result;
 			setupMarker(parkingList);
+			
+			// 미 로그인시 화면에 보여지는 좌표 정보 Table에 Display
+			var stationList = $("#stationList");
+			
+			for(var index = 0;index<displayNum; index++){
+				var tableRow = '';
+				var comboOption = '';
+				tableRow += '<tr>';
+				tableRow += '<td class="index">';
+				tableRow += index+1;
+				tableRow += '</td>';
+				tableRow += '<td class="rackTotCnt">';
+				tableRow += parkingList[index].rackTotCnt;
+				tableRow += '</td>';
+				tableRow += '<td class="stationName">';
+				tableRow += parkingList[index].stationName;
+				tableRow += '</td>';
+				tableRow += '<td class="parkingBikeTotCnt">';
+				tableRow += parkingList[index].parkingBikeTotCnt;
+				tableRow += '</td>';
+				tableRow += '<td class="shared">';
+				tableRow += parkingList[index].shared;
+				tableRow += '</td>';
+				tableRow += '<td class="stationLatitude">';
+				tableRow += parkingList[index].stationLatitude;
+				tableRow += '</td>';
+				tableRow += '<td class="stationLongitude">';
+				tableRow += parkingList[index].stationLongitude;
+				tableRow += '</td>';
+				tableRow += '<td class="stationId">';
+				tableRow += parkingList[index].stationId;
+				tableRow += '</td>';
+				tableRow += '<td class="arrow">';
+				tableRow += '▼';
+				tableRow += '</td>';
+				tableRow += '</tr>';
+				stationList.append(tableRow);
+			}
+			<sec:authorize access="isAuthenticated()">
+			// 대여소 이름 Combobox 추가
+			var stationComboList = $(".stationComboList");
+			
+			var comboOption = '';
+			for(var index in parkingList){
+				comboOption += '<option value="'+parkingList[index].stationName+'" />'; // Storing options in variable
+			}
+			
+			for(var idx = 0;idx<stationComboList.length;idx++){
+				stationComboList[idx].innerHTML = comboOption;
+			}
+			</sec:authorize>
+
 		}
 		,beforeSend:function(xhr){
 			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
@@ -193,7 +309,46 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
         return function(e) {
             var marker = markers[seq],
                 infoWindow = infoWindows[seq];
-
+            <sec:authorize access="isAuthenticated()">
+            if(confirm(parkingList[seq].stationName+"를 즐겨찾기에 추가하시겠습니까?")){
+            	var memberId = document.getElementById("memberId").innerText;
+            	var stationId   = parkingList[seq].stationId;
+            	var stationName = parkingList[seq].stationName;
+            	var params = {memberId:memberId,stationId:stationId,stationName:stationName};
+            	$.ajax({
+            		url:'/member/registerFavorites',
+            		data:JSON.stringify(params),
+            		contentType : 'application/json',
+            		type:'POST',
+            		beforeSend : function(xhr)
+                    {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+                        xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+                    },
+            		error:function(error){
+            			console.log(error);
+            		},
+            		success:function(result){
+            			console.log(result);
+            			self.location = "/board/publicBikeParking";
+            		}
+            	})
+            	console.log(parkingList[seq]);
+            }
+            </sec:authorize>
+            <sec:authorize access="isAnonymous()">
+            if(confirm("로그인을 하면 즐겨찾기 등록이 가능합니다 로그인 하시겠습니까?")){
+            	$.ajax({
+            		url:'/member/loginView',
+            		type:'GET',
+            		error:function(result){
+            			
+            		},
+            		success:function(result){
+            			window.location.href = '/member/loginView';
+            		},
+            	})// $.ajax
+            }
+            </sec:authorize>
             if (infoWindow.getMap()) {
                 infoWindow.close();
             } else {
@@ -202,11 +357,13 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
         }
     }
     
-	
 	function setupMarker(data){
-		// 조회된 10개의 자전거 대여소 위치를 지도에 표시하는 부분
-		for(var loop=0;loop<data.length;loop++){
-	    	if(loop==0){
+		// 현재 위치 기준으로 정렬
+		console.log(sortJSON(data,"asc"));
+		
+		// 조회된 25개의 자전거 대여소 위치를 지도에 표시하는 부분
+		for(var loop=0;loop<displayNum;loop++){
+			if(loop==0){
 	    		setMarker(data[loop].stationLatitude,data[loop].stationLongitude,data[loop].stationName);
 	    	}else{
 	    		addMarker(data[loop].stationLatitude,data[loop].stationLongitude,data[loop].stationName);
@@ -215,8 +372,27 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 	    }
 	}
 	
+	var sortJSON = function(data,type) {
+	  if (type == undefined) {
+	    type = "asc";
+	  }
+	  return data.sort(function(a, b) {
+	    //var x = a[key];
+	    //var y = b[key];
+	    
+	    var x = Math.sqrt(Math.pow(parseFloat(longitude)-parseFloat(a.stationLongitude),2)+Math.pow(parseFloat(latitude)-parseFloat(a.stationLatitude),2));
+		var y = Math.sqrt(Math.pow(parseFloat(longitude)-parseFloat(b.stationLongitude),2)+Math.pow(parseFloat(latitude)-parseFloat(b.stationLatitude),2))
+	    
+	    if (type == "desc") {
+	      return x > y ? -1 : x < y ? 1 : 0;
+	    } else if (type == "asc") {
+	      return x < y ? -1 : x > y ? 1 : 0;
+	    }
+	  });
+	};
+	
     map = new naver.maps.Map("map", {
-        center: new naver.maps.LatLng(37.3595316, 127.1052133),
+        center: new naver.maps.LatLng(latitude, longitude),
         zoom: 15,
         mapTypeControl: true
     });
@@ -390,36 +566,36 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 		}); //$.ajax
     	
     });
- 	
+    
     // 지역 이름으로 검색하는 함수 Enter 이벤트
-    $("#dataSubmit").keydown(function(e){
-    	if(!searchPlaceFormObj.find("#placeName").val()){
-    		alert("검색할 지명을 입력해주세요.");
-    		return false;
+    $("#placeName").keydown(function(e){
+    	// EnterKey를 눌렀을때만
+    	if(e.keyCode==13){
+	    	if(!searchPlaceFormObj.find("#placeName").val()){
+	    		alert("검색할 지명을 입력해주세요.");
+	    		return false;
+	    	}
+	    	
+	    	e.preventDefault();
+	    	
+	    	$.ajax({
+				url : '/board/searchPlace',
+				data : {placeName:searchPlaceFormObj.find("#placeName").val()},		
+				dataType : "json",
+				type : 'POST',
+				beforeSend : function(xhr)
+	            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
+	                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+	            },
+				error : function(){
+					alert("통신 실패");
+				},
+				success : function(result){
+					console.log("Success search place");
+					searchPlacenameToCoordinate(result[0]);
+				}
+			}); //$.ajax
     	}
-    	
-    	e.preventDefault();
-    	
-    	//searchPlaceFormObj.submit();
-    	
-    	$.ajax({
-			url : '/board/searchPlace',
-			data : {placeName:searchPlaceFormObj.find("#placeName").val()},		
-			dataType : "json",
-			type : 'POST',
-			beforeSend : function(xhr)
-            {   //데이터를 전송하기 전에 헤더에 csrf값을 설정한다
-                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
-            },
-			error : function(){
-				alert("통신 실패");
-			},
-			success : function(result){
-				console.log("Success search place");
-				searchPlacenameToCoordinate(result[0]);
-			}
-		}); //$.ajax
-    	
     });
     	
         
@@ -435,7 +611,6 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 
         $('#address').on('keydown', function(e) {
             var keyCode = e.which;
-
             if (keyCode === 13) { // Enter Key
                 searchAddressToCoordinate($('#address').val());
             }
@@ -443,7 +618,6 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 
         $('#submit').on('click', function(e) {
             e.preventDefault();
-
             searchAddressToCoordinate($('#address').val());
         });
 		
@@ -622,7 +796,6 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
     var acc = $(".accordion");
     
    	for (i = 0; i < acc.length; i++) {
- 	  
    		acc[i].addEventListener("click", function() {
   		var idx = Number(this.parentElement.parentElement.children[0].textContent)-1;
 		if($(".fold")[idx].style.display=="none"){
@@ -631,22 +804,59 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
  			 $(".fold")[idx].style.display = "none";
  		  }
  	  });
- 		/*
-		document.getElementsByClassName("accordion")[i].addEventListener("click",function(e){
-			console.log(e);
-			console.log(this);
-			var idx = Number(this.parentElement.parentElement.children[0].textContent)-1;
-			if($(".fold")[idx].style.display=="none"){
-	 			 $(".fold")[idx].style.display = "block";
-	 		  }else{
-	 			 $(".fold")[idx].style.display = "none";
-	 		  }
-		});
- 		*/
  	} 
    	
+   	$(".stationName input").on("change",function(){
+   		// 정류장 명이 변경된 row의 Index 찾기
+   		var rowIdx = $(this).parents().parents().index();
+   		// 정류장 목록중에서 변경된 이름과 같은 정류장 찾기
+   		var station = parkingList.filter(data => data.stationName==$(this)[0].value);
+   
+   		if(station.length>0){
+   			// 정류장 이름에 해당하는 ID값으로 변경하기
+   	   		$(".stationId")[rowIdx].children[0].value = station[0].stationId;;
+   		}else{
+   			alert("정확한 정류장 명을 입력 및 선택해주세요");
+   		}
+   		
+   		 
+   	});
+   	
+   	$("#btnSave").on("click",function(){
+   		var favoritesList = new Array();
+   		for(var index = 0; index < $("#favoritesTable")[0].children[1].children.length;index++){
+   			var obj = new Object();
+   			obj.memberId = document.getElementById("memberId").innerText;
+   	   		
+	   	   	for(var loop=2; loop<$("#favoritesTable")[0].children[1].children[0].children.length;loop++){
+		   	     obj[$("#favoritesTable")[0].children[1].children[index].children[loop].children[0].id] = $("#favoritesTable")[0].children[1].children[index].children[loop].children[0].value; 
+		   	 }
+   			favoritesList.push(obj);
+   		}	
+   		
+   		$.ajax({
+   			url : '/member/registerFavoritesList',
+   			data : JSON.stringify(favoritesList),
+   			contentType : 'application/json',
+   			type : "POST",
+   			beforeSend : function(xhr){
+   			 	xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+   			},
+   			error:function(error){
+    			console.log(error);
+    		},
+    		success:function(result){
+    			if(result>0){
+    				alert("성공적으로 업데이트 되었습니다.");
+    			}
+    			
+    		}
+   		});
+   		
+   	});
+   	
+   	
 });
-	
 </script>
 </body>
 </html>

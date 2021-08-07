@@ -1,17 +1,15 @@
 package org.jindory.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
+import org.jindory.domain.PublicBikeFavoritesVO;
 import org.jindory.domain.PublicBikeMemberVO;
 import org.jindory.service.PublicBikeMemberServiceImpl;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import lombok.extern.log4j.Log4j;
 
 @Controller
@@ -100,6 +97,34 @@ public class PublicBikeMemberController {
 		result = result == null ? "pass" : result;
 		
 		return result;
+	}
+	
+	@PostMapping("/registerFavorites")
+	public String postRegisterFavorites(@RequestBody PublicBikeFavoritesVO favorites,RedirectAttributes rttr) {
+		
+		log.info("Request register favorites");
+		
+		Long result = publicBikeMemberService.registerFavorites(favorites);
+		
+		rttr.addFlashAttribute("returnVal",result);
+		
+		return "redirect:/board/publicBikeParking";
+	}
+	
+	@PostMapping("/registerFavoritesList")
+	public String postRegisterFavorites(@RequestBody List<PublicBikeFavoritesVO> favoritesList,RedirectAttributes rttr) {
+		
+		Long result = 0L;
+		log.info("Request register favoritesList");
+		
+		for(int index=0;index<favoritesList.size();index++) {
+			result = publicBikeMemberService.deleteFavorites(favoritesList.get(index));
+			result = publicBikeMemberService.registerFavorites(favoritesList.get(index));
+		}
+		
+		rttr.addFlashAttribute("returnVal",result);
+		
+		return "redirect:/board/publicBikeParking";
 	}
 	
 	@GetMapping("/accessError")

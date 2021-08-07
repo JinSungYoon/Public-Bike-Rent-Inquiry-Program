@@ -1,10 +1,20 @@
 package org.jindory.service;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.jindory.dataSource.BreakdownAttach;
 import org.jindory.dataSource.BreakdownReport;
 import org.jindory.dataSource.PublicBikeMember;
+import org.jindory.domain.Criteria;
+import org.jindory.domain.PublicBikeFavoritesVO;
 import org.jindory.domain.PublicBikeMemberAuthVO;
 import org.jindory.domain.PublicBikeMemberVO;
+import org.jindory.domain.PublicBikeNoticeTimeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,5 +59,66 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 		returnVal = publicBikeMember.login(member);
 		return returnVal;
 	}
+
+	@Override
+	public Long registerFavorites(PublicBikeFavoritesVO favorites) {
+		List<PublicBikeNoticeTimeVO> noticeTimeList= new ArrayList<PublicBikeNoticeTimeVO>();
+		
+		log.info("Confirm favorites info");
+		log.info(favorites);
+		
+		// 화면단에서 YYYY-MM-DDThh:mm 형식이므로 YYYY-MM-DD hh:mm으로 변환 
+		if(favorites.getEffectiveDate()!=null) {
+			favorites.setEffectiveDate(favorites.getEffectiveDate().replace("T"," "));
+		}
+		
+		Long result = publicBikeMember.insertFavorites(favorites);
+		
+		return result;
+	}
+	
+	@Override
+	public Long updateFavorites(PublicBikeFavoritesVO favorites) {
+		List<PublicBikeNoticeTimeVO> noticeTimeList= new ArrayList<PublicBikeNoticeTimeVO>();
+		
+		// 화면단에서 YYYY-MM-DDThh:mm 형식이므로 YYYY-MM-DD hh:mm으로 변환 
+		favorites.setEffectiveDate(favorites.getEffectiveDate().replace("T"," "));
+		
+		Long result = publicBikeMember.updateFavorites(favorites);
+		
+		return result;
+	}
+
+	@Override
+	public Long deleteFavorites(PublicBikeFavoritesVO favorites) {
+		
+		log.info("Delete favorites information");
+		
+		Long result = publicBikeMember.deleteFavorites(favorites);
+		
+		return result;
+	}
+
+	@Override
+	public List<PublicBikeFavoritesVO> searchFavorites(Criteria cri) {
+		List<PublicBikeFavoritesVO> favoritesList= new ArrayList<PublicBikeFavoritesVO>();
+		List<PublicBikeFavoritesVO> returnList= new ArrayList<PublicBikeFavoritesVO>();
+		PublicBikeFavoritesVO favorite = new PublicBikeFavoritesVO();
+		favoritesList = publicBikeMember.searchFavorites(cri);
+		
+		// 화면단에서 YYYY-MM-DDThh:mm형식이므로 YYYY-MM-DD hh:mm를 YYYY-MM-DDThh:mm으로 변환
+		for(int idx=0;idx<favoritesList.size();idx++) {
+			favoritesList.get(idx).setEffectiveDate(favoritesList.get(idx).getEffectiveDate().replace(" ","T"));
+		} 
+		
+		return favoritesList;
+	}
+
+	@Override
+	public int getFavoritesCount(String memberId) {
+		int cnt = publicBikeMember.getFavoritesCount(memberId);
+		return cnt;
+	}
+
 
 }

@@ -4,28 +4,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-
 import java.util.HashMap;
-
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,42 +37,60 @@ import org.jindory.domain.BreakdownReportVO;
 import org.jindory.domain.Criteria;
 import org.jindory.domain.LocationAddressVO;
 import org.jindory.domain.PageDTO;
+import org.jindory.domain.PublicBikeFavoritesVO;
+import org.jindory.domain.UserDetailsVO;
 import org.jindory.service.BreakdownReportService;
+import org.jindory.service.PublicBikeMemberService;
 import org.json.simple.JSONArray;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
 
 @Controller
 @Log4j
 @RequestMapping("/board/*")
+@NoArgsConstructor
 @AllArgsConstructor	// 생성자를 만들고 자동으로 주입하도록 처리하기 위해
 public class PublicBikeParkingController {
-
+	
+	private static final int THREAD_POOL_SIZE = 10;
+	
+	private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+	
 	@Autowired
 	private BreakdownReportService breakdownReportService;
 	
+	@Autowired 
+	private PublicBikeMemberService publicBikeMemberService;
+	
 	@RequestMapping(value="/publicBikeParking",method=RequestMethod.GET)
-	public String bikeRealTimeRent(Criteria cri,Model model) throws Exception{
+	public String bikeRealTimeRent(Criteria cri,Model model,@AuthenticationPrincipal UserDetailsVO user,Authentication authentication) throws Exception{
 		
-		List<BikeVO> result = new ArrayList<BikeVO>();
+		String memberId=null;
+		
+		if(authentication!= null) {
+			String userName = authentication.getName();
+			UserDetailsVO userInfo = (UserDetailsVO)authentication.getPrincipal();
+			memberId = userInfo.getUsername();
+			cri.setMemberId(memberId);
+		}
+			
+		List<PublicBikeFavoritesVO> favoritesList = new ArrayList<PublicBikeFavoritesVO>();
+		
+		List<BikeVO> stationList = new ArrayList<BikeVO>();
 		List<BikeVO> currentState;
-		List<BreakdownReportVO> breakdownList = new ArrayList<BreakdownReportVO>();
-		List<Map<String,Integer>> breakdownCount = new ArrayList<Map<String,Integer>>();
+		PageDTO pageInfo = null;
 		
-		PageDTO pageInfo = new PageDTO(cri, 2000);
-				
-		currentState = PublicBikeRent.getbikeRentResultList("bikeList", Integer.toString((cri.getAmount()*cri.getPageNum())-9),Integer.toString((cri.getAmount()*cri.getPageNum())));
-		result.addAll(currentState);
+		if(memberId!=null) {
+			int cnt = publicBikeMemberService.getFavoritesCount(memberId);
+			pageInfo = new PageDTO(cri, cnt);
+			favoritesList = publicBikeMemberService.searchFavorites(cri);
+		}		
+		model.addAttribute("favorites",favoritesList);
 		
-		List<String> stationList = new ArrayList<String>();
-		//breakdownList = breakdownReportService.searchList();
-		breakdownCount = breakdownReportService.searchBreakdownCount(cri);
-		
-		model.addAttribute("result",result);
 		model.addAttribute("pageMarker",pageInfo);
-		model.addAttribute("breakdownReport",breakdownList);
-		model.addAttribute("breakdownCount",breakdownCount);
+		
 		return "/board/publicBikeParking";
 	}
 	
@@ -81,14 +98,29 @@ public class PublicBikeParkingController {
 	@RequestMapping(value="/publicBikeParkingList",method=RequestMethod.POST)
 	public @ResponseBody Object publicBikeParkingList() throws Exception{
 		
-		JSONArray list = new JSONArray();
-		JSONArray temp = new JSONArray();
-		for(int loop=1;loop<=2000;loop=loop+1000) {
-			temp = PublicBikeRent.getbikeRentResultJson("bikeList", Integer.toString(loop),Integer.toString(loop+999));
-			list.addAll(temp);
-		}
-						
-		return list;
+		long start = System.currentTimeMillis(); //시작하는 시점 계산
+		
+		Future<Object> future = executor.submit(()->{
+			JSONArray list = new JSONArray();
+			IntStream.range(0, 2).forEach(n->{
+				JSONArray temp = new JSONArray();
+				try {
+					temp = PublicBikeRent.getbikeRentResultJson("bikeList", Integer.toString((n*1000)+1),Integer.toString((n*1000)+1000));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				list.addAll(temp);
+			});
+			return list;
+		});
+		
+		JSONArray result = (JSONArray) future.get();
+		
+		long end = System.currentTimeMillis(); //프로그램이 끝나는 시점 계산
+		System.out.println( "실행 시간 : " + ( end - start )/1000.0 +"초"); //실행 시간 계산 및 출력
+		
+		return result;
 	}
 	
 	//@ResponseBody를 사용해주면 view를 생성해주는것이 아니라, JSON 혹은 Object 형태로 데이터로 전달

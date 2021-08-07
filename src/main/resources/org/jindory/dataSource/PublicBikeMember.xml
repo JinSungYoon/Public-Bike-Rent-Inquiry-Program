@@ -57,6 +57,117 @@
         WHERE MEMBER_ID = #{memberId}
 	</update>
 	
+	<select id="searchFavorites" resultType="org.jindory.domain.PublicBikeFavoritesVO">
+		SELECT memberId,stationId,stationName,noticeBikeNum,noticeScope,noticeTime1,noticeTime2,noticeTime3,effectiveDate,activeYn
+	    FROM (
+	    SELECT ROWNUM rn,MEMBER_ID as memberId,STATION_ID as stationId,STATION_NAME as stationName,NOTICE_BIKE_NUM as noticeBikeNum,NOTICE_SCOPE as noticeScope,NOTICE_TIME1 as noticeTime1,NOTICE_TIME2 as noticeTime2,NOTICE_TIME3 as noticeTime3,TO_CHAR(EFFECTIVE_DATE,'YYYY-MM-DD HH24:MI') as effectiveDate,ACTIVE_YN as activeYn
+			FROM public_bike_favorites
+			WHERE ROWNUM BETWEEN 1 AND 100
+	          AND MEMBER_ID = #{memberId}
+	    ORDER BY CREATE_DATE,STATION_ID
+	    )
+    	WHERE rn BETWEEN (#{pageNum}*#{amount})-9 AND (#{pageNum}*#{amount})
+	</select>
+		
+	<select id="getFavoritesCount" resultType="int">
+	SELECT COUNT(*) as CNT
+	FROM public_bike_favorites
+	WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+	<insert id="insertFavorites">
+		INSERT INTO PUBLIC_BIKE_FAVORITES(
+										MEMBER_ID,
+										STATION_ID,
+										STATION_NAME,
+										<if test="noticeBikeNum!=null">
+										NOTICE_BIKE_NUM,
+										</if>
+										<if test="noticeScope!=null">
+										NOTICE_SCOPE,
+										</if>
+										<if test="effectiveDate!=null">
+										EFFECTIVE_DATE,
+										</if>
+										<if test="noticeTime1!=null">
+										NOTICE_TIME1,
+										</if>
+										<if test="noticeTime2!=null">
+										NOTICE_TIME2,
+										</if>
+										<if test="noticeTime3!=null">
+										NOTICE_TIME3,
+										</if>
+										<if test="activeYn!=null">
+										ACTIVE_YN,
+										</if>
+										CREATE_DATE,
+										UPDATE_DATE
+										)
+									VALUES(
+										#{memberId},
+										#{stationId},
+										#{stationName},
+										<if test="noticeBikeNum!=null">
+										#{noticeBikeNum},
+										</if>
+										<if test="noticeScope!=null">
+										#{noticeScope},
+										</if>
+										<if test="noticeTime1!=null">
+										#{noticeTime1},
+										</if>
+										<if test="noticeTime2!=null">
+										#{noticeTime2},
+										</if>
+										<if test="noticeTime3!=null">
+										#{noticeTime3},
+										</if>
+										<if test="effectiveDate!=null">
+										TO_DATE(#{effectiveDate},'YYYY-MM-DD HH24:MI'),
+										</if>
+										<if test="activeYn!=null">
+										#{activeYn},
+										</if>
+										SYSDATE,
+										SYSDATE
+										)
+	</insert>
+	
+	<update id="updateFavorites">
+		UPDATE PUBLIC_BIKE_FAVORITES SET
+			<if test="noticeBikeNum!=null">
+			NOTICE_BIKE_NUM = #{noticeBikeNum},
+			</if>
+			<if test="noticeScope!=null">
+			NOTICE_SCOPE    = #{noticeScope},
+			</if>
+			<if test="noticeTime1!=null">
+			#{noticeTime1},
+			</if>
+			<if test="noticeTime2!=null">
+			#{noticeTime2},
+			</if>
+			<if test="noticeTime3!=null">
+			#{noticeTime3},
+			</if>
+			<if test="effectiveDate!=null">
+			EFFECTIVE_DATE  = TO_DATE(#{effectiveDate},'YYYY-MM-DD HH24:MI'),
+			</if>
+			<if test="activeYn!=null">
+			ACTIVE_YN       = #{activeYn},
+			</if>
+			UPDATE_DATE     = SYSDATE
+		WHERE MEMBER_ID  = #{memberId} 
+		AND   STATION_ID = #{stationId} 
+	</update>
+	
+	<delete id="deleteFavorites">
+		DELETE PUBLIC_BIKE_FAVORITES 
+		WHERE MEMBER_ID = #{memberId}
+		AND   STATION_ID = #{stationId}
+	</delete>
+	
 	<resultMap type="org.jindory.domain.PublicBikeMemberVO" id="memberMap">
 		<id property="memberId" column="member_id"/>
 		<result property="memberId" column="member_id"/>

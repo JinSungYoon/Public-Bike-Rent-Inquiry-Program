@@ -41,6 +41,6 @@ public class samplePublicBicycle {
         }
         rd.close();
         conn.disconnect();
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
     }
 }

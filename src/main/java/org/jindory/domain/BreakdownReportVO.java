@@ -16,7 +16,6 @@ public class BreakdownReportVO {
 	private String writer;
 	private Date createDate;
 	private Date updateDate;
-	
 	private List<BreakdownAttachVO> attachList;
 	
 }

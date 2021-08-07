@@ -48,7 +48,7 @@ public class PublicBikeRent {
         }
         rd.close();
         conn.disconnect();
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
         
         return sb.toString();
     }
@@ -102,7 +102,7 @@ public class PublicBikeRent {
 		 //response
 		 JSONObject j_rentBikeStatus= (JSONObject) jsonObj.get("rentBikeStatus");
 		 JSONArray j_row = (JSONArray) j_rentBikeStatus.get("row");
-		 System.out.println("j_row : "+j_row);
+		 //System.out.println("j_row : "+j_row);
 		 
 		 return j_row;
 		 
