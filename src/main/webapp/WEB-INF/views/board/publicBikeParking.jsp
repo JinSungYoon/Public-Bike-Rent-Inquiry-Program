@@ -183,47 +183,9 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			alert("통신 실패");
 		},
 		success : function(result){
-			console.log("Success laod public bike parking list");
 			parkingList = result;
-			setupMarker(parkingList);
-			
-			// 미 로그인시 화면에 보여지는 좌표 정보 Table에 Display
-			var stationList = $("#stationList");
-			
-			for(var index = 0;index<displayNum; index++){
-				var tableRow = '';
-				var comboOption = '';
-				tableRow += '<tr>';
-				tableRow += '<td class="index">';
-				tableRow += index+1;
-				tableRow += '</td>';
-				tableRow += '<td class="rackTotCnt">';
-				tableRow += parkingList[index].rackTotCnt;
-				tableRow += '</td>';
-				tableRow += '<td class="stationName">';
-				tableRow += parkingList[index].stationName;
-				tableRow += '</td>';
-				tableRow += '<td class="parkingBikeTotCnt">';
-				tableRow += parkingList[index].parkingBikeTotCnt;
-				tableRow += '</td>';
-				tableRow += '<td class="shared">';
-				tableRow += parkingList[index].shared;
-				tableRow += '</td>';
-				tableRow += '<td class="stationLatitude">';
-				tableRow += parkingList[index].stationLatitude;
-				tableRow += '</td>';
-				tableRow += '<td class="stationLongitude">';
-				tableRow += parkingList[index].stationLongitude;
-				tableRow += '</td>';
-				tableRow += '<td class="stationId">';
-				tableRow += parkingList[index].stationId;
-				tableRow += '</td>';
-				tableRow += '<td class="arrow">';
-				tableRow += '▼';
-				tableRow += '</td>';
-				tableRow += '</tr>';
-				stationList.append(tableRow);
-			}
+			setupMarker(parkingList,latitude,longitude);
+			setupStationList();
 			<sec:authorize access="isAuthenticated()">
 			// 대여소 이름 Combobox 추가
 			var stationComboList = $(".stationComboList");
@@ -237,7 +199,7 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 				stationComboList[idx].innerHTML = comboOption;
 			}
 			</sec:authorize>
-
+			
 		}
 		,beforeSend:function(xhr){
 			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
@@ -247,6 +209,49 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			closeLoadingWithMask();
 		}
 	});
+	
+	function setupStationList(){
+		// 미 로그인시 화면에 보여지는 좌표 정보 Table에 Display
+		var stationList = $("#stationList");
+		
+		// Table내용 모두 지우기
+		stationList.empty();
+		
+		for(var index = 0;index<displayNum; index++){
+			var tableRow = '';
+			var comboOption = '';
+			tableRow += '<tr>';
+			tableRow += '<td class="index">';
+			tableRow += index+1;
+			tableRow += '</td>';
+			tableRow += '<td class="rackTotCnt">';
+			tableRow += parkingList[index].rackTotCnt;
+			tableRow += '</td>';
+			tableRow += '<td class="stationName">';
+			tableRow += parkingList[index].stationName;
+			tableRow += '</td>';
+			tableRow += '<td class="parkingBikeTotCnt">';
+			tableRow += parkingList[index].parkingBikeTotCnt;
+			tableRow += '</td>';
+			tableRow += '<td class="shared">';
+			tableRow += parkingList[index].shared;
+			tableRow += '</td>';
+			tableRow += '<td class="stationLatitude">';
+			tableRow += parkingList[index].stationLatitude;
+			tableRow += '</td>';
+			tableRow += '<td class="stationLongitude">';
+			tableRow += parkingList[index].stationLongitude;
+			tableRow += '</td>';
+			tableRow += '<td class="stationId">';
+			tableRow += parkingList[index].stationId;
+			tableRow += '</td>';
+			tableRow += '<td class="arrow">';
+			tableRow += '▼';
+			tableRow += '</td>';
+			tableRow += '</tr>';
+			stationList.append(tableRow);
+		}
+	}
 	
 	// 초기에 marker를 설정하는 함수
     function setMarker(lat,lng,stationName){
@@ -357,11 +362,14 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
         }
     }
     
-	function setupMarker(data){
+	function setupMarker(data,lat,lng){
 		// 현재 위치 기준으로 정렬
-		console.log(sortJSON(data,"asc"));
+		sortJSON(data,"asc",lat,lng);
 		
-		// 조회된 25개의 자전거 대여소 위치를 지도에 표시하는 부분
+		markers.length = 0;
+		marker = {};
+		
+		// 조회된 10개의 자전거 대여소 위치를 지도에 표시하는 부분	
 		for(var loop=0;loop<displayNum;loop++){
 			if(loop==0){
 	    		setMarker(data[loop].stationLatitude,data[loop].stationLongitude,data[loop].stationName);
@@ -372,16 +380,17 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 	    }
 	}
 	
-	var sortJSON = function(data,type) {
+	var sortJSON = function(data,type,lat,lng) {
 	  if (type == undefined) {
 	    type = "asc";
 	  }
 	  return data.sort(function(a, b) {
-	    //var x = a[key];
-	    //var y = b[key];
 	    
-	    var x = Math.sqrt(Math.pow(parseFloat(longitude)-parseFloat(a.stationLongitude),2)+Math.pow(parseFloat(latitude)-parseFloat(a.stationLatitude),2));
-		var y = Math.sqrt(Math.pow(parseFloat(longitude)-parseFloat(b.stationLongitude),2)+Math.pow(parseFloat(latitude)-parseFloat(b.stationLatitude),2))
+		var x = getDistanceFromLatLonInKm(lat,lng,a.stationLatitude,a.stationLongitude);
+		var y = getDistanceFromLatLonInKm(lat,lng,b.stationLatitude,b.stationLongitude);
+		  
+	    //var x = Math.sqrt(Math.pow(parseFloat(lng)-parseFloat(a.stationLongitude),2)+Math.pow(parseFloat(lat)-parseFloat(a.stationLatitude),2));
+		//var y = Math.sqrt(Math.pow(parseFloat(lng)-parseFloat(b.stationLongitude),2)+Math.pow(parseFloat(lat)-parseFloat(b.stationLatitude),2))
 	    
 	    if (type == "desc") {
 	      return x > y ? -1 : x < y ? 1 : 0;
@@ -390,6 +399,20 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 	    }
 	  });
 	};
+	
+	// 위/경도간 거리 구하는 함수
+	function getDistanceFromLatLonInKm(lat1,lng1,lat2,lng2) { 
+		function deg2rad(deg) { return deg * (Math.PI/180) } 
+		var R = 6371; // Radius of the earth in km 
+		var dLat = deg2rad(lat2-lat1); // deg2rad below 
+		var dLon = deg2rad(lng2-lng1); 
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		var d = R * c; // Distance in km 
+		return d; 
+	}
+
+	
 	
     map = new naver.maps.Map("map", {
         center: new naver.maps.LatLng(latitude, longitude),
@@ -486,8 +509,13 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
                 '</div>'
             ].join('\n'));
 			
+         	// 위도 변경
+            latitude  = parseFloat(item.y);
+            // 경도 변경
+            longitude = parseFloat(item.x);
+            
             map.setCenter(point);
-            infoWindow.open(map, point);
+            //infoWindow.open(map, point);
             
         });
     }
@@ -528,13 +556,18 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
                 '</div>'
             ].join('\n'));
 			
+            // 위도 변경
+            latitude  = parseFloat(item.y);
+            // 경도 변경
+            longitude = parseFloat(item.x);
+    
             map.setCenter(point);
-            infoWindow.open(map, point);
+            //infoWindow.open(map, point);
             
         });
     }
 	
-    // 지역 이름으로 검색하는 함수 CLick 이벤트
+    // 주소로 검색하는 함수 CLick 이벤트
     var searchPlaceFormObj = $("#searchPlaceForm");
     
     $("#dataSubmit").on("click",function(e){
@@ -562,6 +595,8 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 			success : function(result){
 				console.log("Success search place");
 				searchPlacenameToCoordinate(result[0]);
+				setupMarker(parkingList,latitude,longitude);
+				setupStationList();
 			}
 		}); //$.ajax
     	
@@ -593,6 +628,8 @@ $(document).ready(function(){	// 브라우저 트리를 생성한 직후 생성
 				success : function(result){
 					console.log("Success search place");
 					searchPlacenameToCoordinate(result[0]);
+					setupMarker(parkingList,latitude,longitude);
+					setupStationList();
 				}
 			}); //$.ajax
     	}

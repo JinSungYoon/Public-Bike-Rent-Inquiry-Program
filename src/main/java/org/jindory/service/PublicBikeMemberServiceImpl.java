@@ -14,7 +14,6 @@ import org.jindory.domain.Criteria;
 import org.jindory.domain.PublicBikeFavoritesVO;
 import org.jindory.domain.PublicBikeMemberAuthVO;
 import org.jindory.domain.PublicBikeMemberVO;
-import org.jindory.domain.PublicBikeNoticeTimeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,7 +61,6 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 
 	@Override
 	public Long registerFavorites(PublicBikeFavoritesVO favorites) {
-		List<PublicBikeNoticeTimeVO> noticeTimeList= new ArrayList<PublicBikeNoticeTimeVO>();
 		
 		log.info("Confirm favorites info");
 		log.info(favorites);
@@ -79,7 +77,6 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 	
 	@Override
 	public Long updateFavorites(PublicBikeFavoritesVO favorites) {
-		List<PublicBikeNoticeTimeVO> noticeTimeList= new ArrayList<PublicBikeNoticeTimeVO>();
 		
 		// 화면단에서 YYYY-MM-DDThh:mm 형식이므로 YYYY-MM-DD hh:mm으로 변환 
 		favorites.setEffectiveDate(favorites.getEffectiveDate().replace("T"," "));
@@ -108,7 +105,10 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 		
 		// 화면단에서 YYYY-MM-DDThh:mm형식이므로 YYYY-MM-DD hh:mm를 YYYY-MM-DDThh:mm으로 변환
 		for(int idx=0;idx<favoritesList.size();idx++) {
-			favoritesList.get(idx).setEffectiveDate(favoritesList.get(idx).getEffectiveDate().replace(" ","T"));
+			// null check
+			if(favoritesList.get(idx).getEffectiveDate()!=null) {
+				favoritesList.get(idx).setEffectiveDate(favoritesList.get(idx).getEffectiveDate().replace(" ","T"));
+			}
 		} 
 		
 		return favoritesList;
@@ -118,6 +118,13 @@ public class PublicBikeMemberServiceImpl implements PublicBikeMemberService {
 	public int getFavoritesCount(String memberId) {
 		int cnt = publicBikeMember.getFavoritesCount(memberId);
 		return cnt;
+	}
+
+	@Override
+	public List<PublicBikeFavoritesVO> getAlertFavorites() {
+		List<PublicBikeFavoritesVO> alertFavoritesList= new ArrayList<PublicBikeFavoritesVO>();
+		alertFavoritesList = publicBikeMember.getAlertFavorites();
+		return alertFavoritesList;
 	}
 
 

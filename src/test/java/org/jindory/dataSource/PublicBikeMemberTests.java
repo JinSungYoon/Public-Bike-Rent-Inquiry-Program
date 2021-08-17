@@ -10,7 +10,6 @@ import java.util.List;
 import org.jindory.domain.Criteria;
 import org.jindory.domain.PublicBikeFavoritesVO;
 import org.jindory.domain.PublicBikeMemberVO;
-import org.jindory.domain.PublicBikeNoticeTimeVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +124,7 @@ public class PublicBikeMemberTests {
 //		}
 //		log.info("============================= End =================================");
 //	}
-		
+
 //	@Test
 //	public void testSearchFavorites(){
 //		Criteria cri = new Criteria();
@@ -139,11 +138,20 @@ public class PublicBikeMemberTests {
 //		log.info("============================================== End ====================================================");
 //	}
 	
+//	@Test
+//	public void testGetFavoritesCount() {
+//		log.info("============================================== Start test getFavoritesCount ====================================================");
+//		int cnt = publicBikeMember.getFavoritesCount("yjs445566@naver.com");
+//		log.info("Total Count : "+cnt);
+//		log.info("============================================== End ====================================================");
+//	}
+	
 	@Test
-	public void testGetFavoritesCount() {
-		log.info("============================================== Start test getFavoritesCount ====================================================");
-		int cnt = publicBikeMember.getFavoritesCount("yjs445566@naver.com");
-		log.info("Total Count : "+cnt);
+	public void testGetAlertFavorites() {
+		log.info("============================================== Start test GetAlertFavorites ====================================================");
+		List<PublicBikeFavoritesVO> favoritesList = new ArrayList<PublicBikeFavoritesVO>();
+		favoritesList = publicBikeMember.getAlertFavorites();
+		favoritesList.forEach(data -> log.info(data));
 		log.info("============================================== End ====================================================");
 	}
 	

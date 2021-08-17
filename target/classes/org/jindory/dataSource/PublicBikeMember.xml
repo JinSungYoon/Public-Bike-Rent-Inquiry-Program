@@ -75,6 +75,19 @@
 	WHERE MEMBER_ID = #{memberId}
 	</select>
 	
+	<select id="getAlertFavorites" resultMap="favoritesMap">
+	SELECT * 
+	FROM public_bike_favorites
+	WHERE 1=1
+	    AND ACTIVE_YN = 'Y'
+	    AND EFFECTIVE_DATE > SYSDATE
+	    AND NOTICE_BIKE_NUM IS NOT NULL
+	    AND(NOTICE_TIME1 BETWEEN TO_CHAR(SYSDATE - 15/(24*60),'HH24:MI') AND TO_CHAR(SYSDATE + 15/(24*60),'HH24:MI') 
+			OR NOTICE_TIME2 BETWEEN TO_CHAR(SYSDATE - 15/(24*60),'HH24:MI') AND TO_CHAR(SYSDATE + 15/(24*60),'HH24:MI') 
+			OR NOTICE_TIME3 BETWEEN TO_CHAR(SYSDATE - 15/(24*60),'HH24:MI') AND TO_CHAR(SYSDATE + 15/(24*60),'HH24:MI') 
+			)
+	</select>
+	
 	<insert id="insertFavorites">
 		INSERT INTO PUBLIC_BIKE_FAVORITES(
 										MEMBER_ID,
@@ -167,6 +180,23 @@
 		WHERE MEMBER_ID = #{memberId}
 		AND   STATION_ID = #{stationId}
 	</delete>
+	
+	<resultMap type="org.jindory.domain.PublicBikeFavoritesVO" id="favoritesMap">
+		<id property="memberId" column="member_id"/>
+		<id property="stationId" column="station_id"/>
+		<result property="memberId" column="member_id"/>
+		<result property="stationId" column="station_id"/>
+		<result property="stationName" column="station_name"/>
+		<result property="noticeBikeNum" column="notice_bike_num"/>
+		<result property="noticeScope" column="notice_scope"/>
+		<result property="noticeTime1" column="notice_time1"/>
+		<result property="noticeTime2" column="notice_time2"/>
+		<result property="noticeTime3" column="notice_time3"/>
+		<result property="effectiveDate" column="effective_date"/>
+		<result property="activeYn" column="active_yn"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateDate" column="update_date"/>
+	</resultMap>
 	
 	<resultMap type="org.jindory.domain.PublicBikeMemberVO" id="memberMap">
 		<id property="memberId" column="member_id"/>

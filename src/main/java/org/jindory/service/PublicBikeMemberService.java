@@ -12,6 +12,7 @@ public interface PublicBikeMemberService {
 	public String checkId(String memberId);
 	public List<PublicBikeFavoritesVO> searchFavorites(Criteria cri);
 	public int getFavoritesCount(String memberId);
+	public List<PublicBikeFavoritesVO> getAlertFavorites();
 	public Long registerFavorites(PublicBikeFavoritesVO favorites);
 	public Long updateFavorites(PublicBikeFavoritesVO favorites);
 	public Long deleteFavorites(PublicBikeFavoritesVO favorites);

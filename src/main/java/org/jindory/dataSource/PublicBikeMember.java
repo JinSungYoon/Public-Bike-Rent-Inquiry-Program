@@ -6,7 +6,6 @@ import org.jindory.domain.Criteria;
 import org.jindory.domain.PublicBikeFavoritesVO;
 import org.jindory.domain.PublicBikeMemberAuthVO;
 import org.jindory.domain.PublicBikeMemberVO;
-import org.jindory.domain.PublicBikeNoticeTimeVO;
 
 public interface PublicBikeMember {
 
@@ -22,7 +21,9 @@ public interface PublicBikeMember {
 	
 	public List<PublicBikeFavoritesVO> searchFavorites(Criteria cri);
 	
-	public int getFavoritesCount(String memberId);
+	public int getFavoritesCount(String memberId); 
+									   
+	public List<PublicBikeFavoritesVO> getAlertFavorites();
 	
 	public Long insertFavorites(PublicBikeFavoritesVO favorites);
 	
